@@ -1,0 +1,10 @@
+# Raw electrophysiology data (DANDI 001336) - fetch locally, never commit
+data/
+
+# Local Python environment
+.venv/
+__pycache__/
+*.pyc
+
+# OS noise
+.DS_Store

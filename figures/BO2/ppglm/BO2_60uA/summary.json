@@ -1,0 +1,30 @@
+{
+  "state": "BO2_60uA",
+  "n_channels": 2,
+  "null_threshold": 0.5394269153475761,
+  "n_edges": 2,
+  "top_edges": [
+    [
+      1,
+      0,
+      13.963081359863281
+    ],
+    [
+      0,
+      1,
+      5.829637050628662
+    ]
+  ],
+  "top_drivers": [
+    1,
+    0
+  ],
+  "top_receivers": [
+    0,
+    1
+  ],
+  "active_channels": [
+    0,
+    2
+  ]
+}
