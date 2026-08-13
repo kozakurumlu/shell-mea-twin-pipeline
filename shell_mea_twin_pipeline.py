@@ -134,10 +134,12 @@ TWIN_PEAK_MIN_RATIO = 1.5      # a dominant peak must top this x band-median
                                # is explicitly "no dominant oscillation"
 TWIN_SIGMA = 0.005       # default noise scale (also an evolvable gene now:
                          # fluctuation/burst amplitude needs a knob)
-TWIN_BURNIN_S = 30       # reservoir washout (s) discarded from every sim:
+TWIN_BURNIN_S = 90       # reservoir washout (s) discarded from every sim:
                          # the zero-state equilibration transient must not
                          # reach the objectives (the exp readout would turn
-                         # it into a fake burst) or the figures
+                         # it into a fake burst) or the figures. 90 s covers
+                         # the slow-pole parameter corner (bgr ~0.99) where a
+                         # 30 s washout left a visible residual decay
 TWIN_SYNC_TRAIN_FRAC = 0.7  # ridge-readout train fraction for the sync loss
 # --- NSGA-III settings following Sethi, Faraz & Wong-Lin (arXiv:2605.25224) ---
 TWIN_N_GEN = 25          # generations (paper: 25, chosen on convergence; the
