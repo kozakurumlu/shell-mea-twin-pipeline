@@ -1,5 +1,215 @@
 [
   {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "10uA",
+    "session_start": "2024-06-25 19:26:19-04:00",
+    "ppglm": {
+      "n_edges": 23,
+      "mean_abs_coupling": 0.6907211045064956,
+      "threshold": 0.36787712872028344
+    },
+    "twin": {
+      "overall": 0.1955021403350763,
+      "target_rate": 9.441666603088379,
+      "target_freq": 0.03333333333333333,
+      "pred_rate": 8.877180099487305,
+      "twin_freq": 0.03333333333333333,
+      "params": {
+        "drive_freq": 0.2986879275498346,
+        "drive_amp": 0.0031162416658197015,
+        "base_geometric_ratio": 0.8094253499201626,
+        "spectral_radius": 0.9913510360440777,
+        "output_gain": 5.42964590952204
+      }
+    },
+    "cebra": {
+      "r2_org_to_twin": -0.2107989341020584,
+      "r2_twin_to_org": -0.53773033618927,
+      "procrustes": 0.9602986642796656
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "20uA",
+    "session_start": "2024-06-25 19:36:03-04:00",
+    "ppglm": {
+      "n_edges": 23,
+      "mean_abs_coupling": 0.5623986531310707,
+      "threshold": 0.3569144621491431
+    },
+    "twin": {
+      "overall": 0.2035662041302626,
+      "target_rate": 9.827083587646484,
+      "target_freq": 0.03333333333333333,
+      "pred_rate": 10.183938026428223,
+      "twin_freq": 0.03333333333333333,
+      "params": {
+        "drive_freq": 0.34448134661696855,
+        "drive_amp": 0.0012829551748720844,
+        "base_geometric_ratio": 0.8026666763903757,
+        "spectral_radius": 1.0198226440042515,
+        "output_gain": 5.990014618619782
+      }
+    },
+    "cebra": {
+      "r2_org_to_twin": -0.2847879230976105,
+      "r2_twin_to_org": -0.18383245170116425,
+      "procrustes": 0.9880037717641117
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "30uA",
+    "session_start": "2024-06-25 19:45:36-04:00",
+    "ppglm": {
+      "n_edges": 46,
+      "mean_abs_coupling": 0.6917742468601416,
+      "threshold": 0.360193872451782
+    },
+    "twin": {
+      "overall": 0.24246967989817603,
+      "target_rate": 9.637499809265137,
+      "target_freq": 0.03333333333333333,
+      "pred_rate": 10.046245574951172,
+      "twin_freq": 0.03333333333333333,
+      "params": {
+        "drive_freq": 0.34643937323087015,
+        "drive_amp": 0.003378627784568514,
+        "base_geometric_ratio": 0.8606191602468661,
+        "spectral_radius": 0.20956443761780263,
+        "output_gain": 13.115944746233241
+      }
+    },
+    "cebra": {
+      "r2_org_to_twin": -0.1648739129304886,
+      "r2_twin_to_org": -0.5208926200866699,
+      "procrustes": 0.9698804794914575
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "40uA",
+    "session_start": "2024-06-25 19:55:12-04:00",
+    "ppglm": {
+      "n_edges": 21,
+      "mean_abs_coupling": 0.46344010591937984,
+      "threshold": 0.3568119049072265
+    },
+    "twin": {
+      "overall": 0.24158457326888305,
+      "target_rate": 9.864583015441895,
+      "target_freq": 0.03333333333333333,
+      "pred_rate": 10.134420394897461,
+      "twin_freq": 0.03333333333333333,
+      "params": {
+        "drive_freq": 0.12177745122267902,
+        "drive_amp": 0.0011999863066680509,
+        "base_geometric_ratio": 0.8203714945798707,
+        "spectral_radius": 0.1838842382839585,
+        "output_gain": 16.563629423955962
+      }
+    },
+    "cebra": {
+      "r2_org_to_twin": -0.3922549784183502,
+      "r2_twin_to_org": -0.6827621459960938,
+      "procrustes": 0.9595518038344812
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "50uA",
+    "session_start": "2024-06-25 20:04:33-04:00",
+    "ppglm": {
+      "n_edges": 16,
+      "mean_abs_coupling": 0.44785110436934084,
+      "threshold": 0.40839612185955043
+    },
+    "twin": {
+      "overall": 0.2190649392217305,
+      "target_rate": 9.176714897155762,
+      "target_freq": 0.03333333333333333,
+      "pred_rate": 8.458956718444824,
+      "twin_freq": 0.03333333333333333,
+      "params": {
+        "drive_freq": 0.33842657271442833,
+        "drive_amp": 0.0032774043313500536,
+        "base_geometric_ratio": 0.7337696948588152,
+        "spectral_radius": 0.7668136444272795,
+        "output_gain": 6.688248442454422
+      }
+    },
+    "cebra": {
+      "r2_org_to_twin": -0.18167312443256378,
+      "r2_twin_to_org": -0.6650535464286804,
+      "procrustes": 0.952941578485049
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "5uA",
+    "session_start": "2024-06-25 19:11:47-04:00",
+    "ppglm": {
+      "n_edges": 23,
+      "mean_abs_coupling": 0.4872912050894469,
+      "threshold": 0.36618383973836893
+    },
+    "twin": {
+      "overall": 0.17424125280408054,
+      "target_rate": 9.710416793823242,
+      "target_freq": 0.03333333333333333,
+      "pred_rate": 10.673905372619629,
+      "twin_freq": 0.03333333333333333,
+      "params": {
+        "drive_freq": 0.34859351172559616,
+        "drive_amp": 0.003164048051736211,
+        "base_geometric_ratio": 0.7441692369739012,
+        "spectral_radius": 1.0147762632399087,
+        "output_gain": 10.879758581246907
+      }
+    },
+    "cebra": {
+      "r2_org_to_twin": -0.059231698513031006,
+      "r2_twin_to_org": -1.6589447259902954,
+      "procrustes": 0.9095352516102002
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "60uA",
+    "session_start": "2024-06-25 20:13:59-04:00",
+    "ppglm": {
+      "n_edges": 16,
+      "mean_abs_coupling": 0.5355629764558855,
+      "threshold": 0.35770677924156175
+    },
+    "twin": {
+      "overall": 0.19837158348109982,
+      "target_rate": 8.185416221618652,
+      "target_freq": 0.03333333333333333,
+      "pred_rate": 8.167311668395996,
+      "twin_freq": 0.03333333333333333,
+      "params": {
+        "drive_freq": 0.28830202203481803,
+        "drive_amp": 0.0024987343867244115,
+        "base_geometric_ratio": 0.8617206744649323,
+        "spectral_radius": 0.7085961942792864,
+        "output_gain": 4.320513402721784
+      }
+    },
+    "cebra": {
+      "r2_org_to_twin": -0.4899991750717163,
+      "r2_twin_to_org": -1.068406105041504,
+      "procrustes": 0.9624347096800023
+    }
+  },
+  {
     "subject": "BO2",
     "session": "BO2",
     "state": "10uA",
@@ -97,7 +307,7 @@
     "session_start": "2023-07-21 11:11:44-04:00",
     "ppglm": null,
     "twin": {
-      "overall": 0.5139263771299623,
+      "overall": 0.29671553217963287,
       "target_rate": 0.2450331151485443,
       "target_freq": 0.24000000000000002,
       "pred_rate": 0.23318110406398773,
@@ -111,9 +321,9 @@
       }
     },
     "cebra": {
-      "r2_org_to_twin": -0.44993361830711365,
-      "r2_twin_to_org": -0.5274726152420044,
-      "procrustes": 0.9743980421838865
+      "r2_org_to_twin": -0.4205879271030426,
+      "r2_twin_to_org": -0.3175145089626312,
+      "procrustes": 0.9685979533167873
     }
   },
   {
@@ -127,7 +337,7 @@
       "threshold": 1.1988358423113823
     },
     "twin": {
-      "overall": 0.5186838788211581,
+      "overall": 0.29946227706171485,
       "target_rate": 2.91961407661438,
       "target_freq": 0.18181818181818182,
       "pred_rate": 3.1519968509674072,
@@ -141,9 +351,9 @@
       }
     },
     "cebra": {
-      "r2_org_to_twin": -0.047831933945417404,
-      "r2_twin_to_org": -0.2281133383512497,
-      "procrustes": 0.9630263845847427
+      "r2_org_to_twin": -0.25953614711761475,
+      "r2_twin_to_org": -0.29105231165885925,
+      "procrustes": 0.9757317841275346
     }
   }
 ]

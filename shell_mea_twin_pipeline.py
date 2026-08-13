@@ -27,8 +27,9 @@ Narrative
        TWIN_N_GEN generations with generation size TWIN_POP_SIZE (paper: 25
        generations, generation size 50);
      - the twin is the Pareto-front member with the lowest overall composite
-       RMSE sqrt(sum_j F_j^2) (paper Sec. III), and the per-generation
-       convergence + Pareto front are saved as figures (paper Figs. 3D/5C).
+       RMSE, the RMS of the normalised RMSEs sqrt(mean_j F_j^2) (paper
+       Sec. III), and the per-generation convergence + Pareto front + paper
+       Fig. 4-style activity traces are saved as figures.
    The twin is AUTONOMOUS (noise + parametric rhythmic drive), i.e. it
    generates the state rather than filtering a replay of the recording.
 3. CEBRA validation: latent embeddings of organoid activity vs twin activity
@@ -149,7 +150,14 @@ RANDOM_SEED = 42
 # =============================================================================
 # Path configuration
 # =============================================================================
-DEFAULT_DATA_ROOT = Path("/content/drive/MyDrive/DANDI_001336_human_neural_organoids_shell_MEA_neuromodulation")
+# Local checkout: data/DANDI_001336 and figures/ next to this script are the
+# defaults, so `python shell_mea_twin_pipeline.py` needs no environment
+# variables. Colab keeps its Drive defaults. SHELL_MEA_DATA_ROOT /
+# SHELL_MEA_FIGURES_DIR / SHELL_MEA_OUTPUT_ROOT still override everything.
+_SCRIPT_DIR = Path(__file__).resolve().parent
+_LOCAL_DATA_ROOT = _SCRIPT_DIR / "data" / "DANDI_001336"
+DEFAULT_DATA_ROOT = (_LOCAL_DATA_ROOT if _LOCAL_DATA_ROOT.is_dir() else
+                     Path("/content/drive/MyDrive/DANDI_001336_human_neural_organoids_shell_MEA_neuromodulation"))
 DEFAULT_OUTPUT_ROOT = Path("/content/drive/MyDrive/RRN_Paper/colab_outputs")
 
 
@@ -166,6 +174,8 @@ DATA_ROOT = _resolve_path(os.getenv("SHELL_MEA_DATA_ROOT"), DEFAULT_DATA_ROOT)
 OUTPUT_ROOT = _resolve_path(os.getenv("SHELL_MEA_OUTPUT_ROOT"), DEFAULT_OUTPUT_ROOT)
 
 _figures_dir = os.getenv("SHELL_MEA_FIGURES_DIR")
+if not _figures_dir and _LOCAL_DATA_ROOT.is_dir():
+    _figures_dir = str(_SCRIPT_DIR / "figures")  # local default: ./figures
 if _figures_dir:
     # Fixed output folder (e.g. ./figures for local runs); reruns overwrite.
     # OUTPUT_ROOT is deliberately untouched here (it may be a Colab path).
@@ -428,19 +438,34 @@ def discover_recordings(data_root):
 
 
 def load_recording(path):
-    """Load 2D acquisition decimated to ~SPIKE_FS. Returns dict or None."""
+    """Load the raw ephys stream decimated to ~SPIKE_FS. Returns dict or None.
+
+    DANDI 001336 files carry two 2D acquisition series: 'ES' (the recorded
+    electrode stream) and 'ES_STIM' (the stimulation command waveform). Select
+    the recorded stream explicitly - never the stim channel - instead of
+    relying on dict iteration order.
+    """
     try:
         with NWBHDF5IO(str(path), "r") as io:
             nwbfile = io.read()
             session_start = getattr(nwbfile, "session_start_time", None)
-            for _, d in nwbfile.acquisition.items():
-                if hasattr(d, "data") and len(d.data.shape) == 2:
-                    rate = float(getattr(d, "rate", 30000.0))
-                    step = int(max(1, round(rate / SPIKE_FS)))
-                    raw = d.data[::step].astype(np.float32)
-                    np.nan_to_num(raw, copy=False)
-                    return {'raw': raw, 'fs': rate / step,
-                            'session_start': session_start}
+            twod = {name: d for name, d in nwbfile.acquisition.items()
+                    if hasattr(d, "data") and len(d.data.shape) == 2}
+            if not twod:
+                print(f"      No 2D acquisition series in {path.name}")
+                return None
+            if 'ES' in twod:
+                name = 'ES'
+            else:
+                non_stim = [n for n in sorted(twod) if 'STIM' not in n.upper()]
+                name = non_stim[0] if non_stim else sorted(twod)[0]
+            d = twod[name]
+            rate = float(getattr(d, "rate", 30000.0))
+            step = int(max(1, round(rate / SPIKE_FS)))
+            raw = d.data[::step].astype(np.float32)
+            np.nan_to_num(raw, copy=False)
+            return {'raw': raw, 'fs': rate / step,
+                    'session_start': session_start}
     except Exception as e:
         print(f"      Error loading {path.name}: {e}")
     return None
@@ -838,8 +863,8 @@ def _twin_metrics(params, pop_env, targets, skeleton=None, W_values=None,
     normalised by its target, F_x = RMSE_x / (x_target + eps). The three
     normalised RMSEs (rate, dominant frequency, spectral containment with
     target containment 1) stay SEPARATE as the NSGA-III objectives; `overall`
-    is the paper's composite sqrt(sum_j F_j^2) used afterwards to pick one
-    twin off the Pareto front.
+    is the composite - the RMS of the normalised RMSEs, sqrt(mean_j F_j^2)
+    (paper Sec. III) - used afterwards to pick one twin off the Pareto front.
     """
     if n_trials is None:
         n_trials = TWIN_N_TRIALS
@@ -878,7 +903,7 @@ def _twin_metrics(params, pop_env, targets, skeleton=None, W_values=None,
         if not np.all(np.isfinite(F)):
             return None
         F = np.minimum(F, TWIN_F_CAP)
-        overall = float(np.sqrt(np.sum(F ** 2)))  # paper composite RMSE
+        overall = float(np.sqrt(np.mean(F ** 2)))  # RMS of the normalised RMSEs
         return {'pred_rate': float(rates.mean()),
                 'twin_freq': float(np.median(twin_freqs)),
                 'containment': float(containments.mean()),
@@ -985,7 +1010,7 @@ def run_twinning(pop_env):
             m = _twin_metrics(params, pop_env, targets, skeleton, W_values)
             if m is not None:
                 Fv = np.array([m['rmse_rate'], m['rmse_freq'], m['rmse_spec']])
-                comp = float(np.sqrt(np.sum(Fv ** 2)))
+                comp = float(np.sqrt(np.mean(Fv ** 2)))
                 if comp < best_seen['comp']:
                     best_seen.update(comp=comp, X=np.array(X, dtype=float), F=Fv)
                 out["F"] = Fv
@@ -1005,7 +1030,7 @@ def run_twinning(pop_env):
 
         def notify(self, algorithm):
             F = np.asarray(algorithm.pop.get("F"), dtype=float)
-            comp = np.sqrt((F ** 2).sum(axis=1))
+            comp = np.sqrt((F ** 2).mean(axis=1))  # same RMS form as selection
             valid = np.all(F < TWIN_FAIL_F, axis=1)
             self.data["best"].append(float(comp.min()))
             self.data["median_valid"].append(
@@ -1025,8 +1050,8 @@ def run_twinning(pop_env):
     # JSON-safe convergence trace (the raw X/F arrays stay out of the report)
     conv_json = {k: conv_data.get(k, []) for k in ("best", "median_valid", "n_valid")}
 
-    # Select the Pareto-front member with the lowest composite RMSE
-    # sqrt(sum_j F_j^2) (paper Sec. III). Pool res.opt (only the niche
+    # Select the Pareto-front member with the lowest composite RMSE, the RMS
+    # of the normalised RMSEs (paper Sec. III). Pool res.opt (only the niche
     # representatives in pymoo's NSGA-III), the full final population and the
     # running best-ever individual, then take the pool's non-dominated front:
     # the min-composite member is always non-dominated, so it survives this.
@@ -1051,7 +1076,7 @@ def run_twinning(pop_env):
     F, X = F[valid], X[valid]
     nd = NonDominatedSorting().do(F, only_non_dominated_front=True)
     F, X = F[nd], X[nd]
-    agg = np.sqrt(np.sum(F ** 2, axis=1))
+    agg = np.sqrt(np.mean(F ** 2, axis=1))
     best_i = int(np.argmin(agg))
     best_X = X[best_i]
     best_params = _vec_to_params(best_X[:n_g])
@@ -1071,9 +1096,10 @@ def run_twinning(pop_env):
         'crossover': 'SBX(eta=30, prob=1.0)', 'mutation': 'PM(eta=20, prob=1/n_var)',
         'n_var': int(len(xl)), 'n_recurrent_weights': int(n_w),
         'objectives': 'F = RMSE_over_trials/(target+eps): rate, dom_freq, 1-containment',
-        'composite': 'sqrt(sum_j F_j^2)', 'seed': RANDOM_SEED,
+        'composite': 'sqrt(mean_j F_j^2) (RMS of normalised RMSEs)',
+        'seed': RANDOM_SEED,
     }
-    print(f"      Best composite RMSE sqrt(sum F^2): {m['overall']:.4f} | "
+    print(f"      Best composite RMSE sqrt(mean F^2): {m['overall']:.4f} | "
           f"rate {m['pred_rate']:.4f} vs {targets['target_rate']:.4f} Hz | "
           f"freq {m['twin_freq']:.4f} vs {targets['target_freq']:.4f} Hz | "
           f"containment {m['containment']:.3f} | front size {len(F)} | "
@@ -1144,7 +1170,7 @@ def plot_twin_report(twin, pop_env, title, output_path, skeleton=None, W_values=
         f"(F {details['rmse_freq']:.3f})\n"
         f"  PSD containment:  {details['containment']:.3f} "
         f"(F {details['rmse_spec']:.3f})\n"
-        f"  COMPOSITE sqrt(sum F^2): {details['overall']:.4f}\n"
+        f"  COMPOSITE sqrt(mean F^2): {details['overall']:.4f}\n"
         f"  NSGA-III: pop {TWIN_POP_SIZE} x {TWIN_N_GEN} gens "
         f"(arXiv:2605.25224 settings)\n\n"
         f"Twin parameters\n"
@@ -1192,7 +1218,7 @@ def plot_ga_report(twin, title, output_path):
         ax.set_xlabel(f'{names[i]} (normalised RMSE)')
         ax.set_ylabel(f'{names[j]} (normalised RMSE)')
         ax.grid(True, alpha=0.3)
-        plt.colorbar(sc, ax=ax, label='composite sqrt(sum F^2), darker = lower')
+        plt.colorbar(sc, ax=ax, label='composite sqrt(mean F^2), darker = lower')
 
     ax = axes.flat[3]
     best = conv.get('best', [])
@@ -1207,12 +1233,73 @@ def plot_ga_report(twin, title, output_path):
         ax.set_yscale('log')
         ax.legend(fontsize=9)
     ax.set_xlabel('Generation')
-    ax.set_ylabel('Composite RMSE sqrt(sum F^2)')
+    ax.set_ylabel('Composite RMSE sqrt(mean F^2)')
     ax.set_title(f'Convergence (pop {TWIN_POP_SIZE}, {TWIN_N_TRIALS} trials/eval)')
     ax.grid(True, alpha=0.3, which='both')
 
     plt.suptitle(f'{title}\nPareto front, {F.shape[0]} non-dominated solutions',
                  fontsize=14, fontweight='bold')
+    plt.tight_layout()
+    _safe_savefig(fig, output_path)
+    plt.close(fig)
+
+
+def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
+                       W_values=None):
+    """Paper-style activity traces (arXiv:2605.25224 Figs. 3B-C / 4A-B).
+
+    (A) organoid vs twin population firing-rate timecourses in real units
+    (Hz), individual noise-realisation trials faint, trial mean bold, with
+    dashed target/achieved rate lines; (B) the corresponding normalised PSDs
+    with the dominant (highest-peak) frequencies marked against target.
+    """
+    params, targets, details = twin['params'], twin['targets'], twin['details']
+    activity, _, _ = simulate_twin(params, len(pop_env), skeleton, W_values,
+                                   n_trials=TWIN_N_TRIALS)
+    rate_traces = params['output_gain'] * activity  # (n_trials, T), in Hz
+    t = np.arange(len(pop_env)) * ENV_BIN_S
+
+    fig, (ax_a, ax_b) = plt.subplots(2, 1, figsize=(14, 9))
+
+    for row in rate_traces:  # individual trials (paper Eqn. 3 trials)
+        ax_a.plot(t, row, color='lightcoral', lw=0.5, alpha=0.25, zorder=1)
+    ax_a.plot(t, pop_env, color='tab:blue', lw=1.0, zorder=3,
+              label='Organoid population rate')
+    ax_a.plot(t, rate_traces.mean(axis=0), color='crimson', lw=1.3, zorder=4,
+              label=f'RRN twin rate (mean of {TWIN_N_TRIALS} trials)')
+    ax_a.axhline(targets['target_rate'], color='gray', ls='--', lw=1.2,
+                 zorder=2, label=f"target rate {targets['target_rate']:.3f} Hz")
+    ax_a.axhline(details['pred_rate'], color='red', ls='--', lw=1.2, zorder=2,
+                 label=f"twin rate {details['pred_rate']:.3f} Hz")
+    ax_a.set_xlabel('Time (s)')
+    ax_a.set_ylabel('Population firing rate (Hz)')
+    ax_a.set_title('(A) Population firing-rate timecourse: organoid vs '
+                   'autonomous twin')
+    ax_a.legend(fontsize=9, ncol=2)
+    ax_a.grid(True, alpha=0.3)
+
+    x = detrend(activity.astype(np.float64), axis=1)
+    freqs, psd = welch(x, fs=1.0 / ENV_BIN_S, nperseg=targets['nperseg'], axis=1)
+    band = (freqs >= TWIN_PEAK_BAND[0]) & (freqs <= TWIN_PEAK_BAND[1])
+    band_psd = psd[:, band]
+    band_norm = band_psd / (band_psd.sum(axis=1, keepdims=True) + 1e-30)
+    for row in band_norm:
+        ax_b.plot(freqs[band], row, color='lightcoral', lw=0.5, alpha=0.25)
+    ax_b.plot(targets['psd_freqs'], targets['psd_norm'], color='tab:blue',
+              lw=1.6, label='Organoid PSD')
+    ax_b.plot(freqs[band], band_norm.mean(axis=0), color='crimson', lw=1.6,
+              label='Twin PSD (trial mean)')
+    ax_b.axvline(targets['target_freq'], color='black', ls='--', lw=1.2,
+                 label=f"target {targets['target_freq']:.3f} Hz")
+    ax_b.axvline(details['twin_freq'], color='red', ls='--', lw=1.2,
+                 label=f"twin {details['twin_freq']:.3f} Hz")
+    ax_b.set_xlabel('Frequency (Hz)')
+    ax_b.set_ylabel('Normalised PSD')
+    ax_b.set_title('(B) Dominant network oscillation (highest peak vs target)')
+    ax_b.legend(fontsize=9)
+    ax_b.grid(True, alpha=0.3)
+
+    plt.suptitle(title, fontsize=14, fontweight='bold')
     plt.tight_layout()
     _safe_savefig(fig, output_path)
     plt.close(fig)
@@ -1387,6 +1474,10 @@ def process_recording(rec, out_base):
             plot_ga_report(twin_result,
                            f'{subject} - {label} - NSGA-III optimisation',
                            os.path.join(tw_dir, 'ga_pareto_convergence.png'))
+            plot_twin_activity(twin_result, pop_env,
+                               f'{subject} - {label} - Twin vs organoid activity',
+                               os.path.join(tw_dir, 'twin_activity_traces.png'),
+                               skeleton=skel, W_values=Wv)
             _, twin_amps, _ = simulate_twin(twin_result['params'], len(pop_env), skel, Wv)
             params_json = {
                 'state': label, 'overall_rmse': twin_result['overall'],

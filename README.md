@@ -46,12 +46,18 @@ python -m venv .venv
 .venv/bin/pip install torch cebra
 
 # raw data is NOT in this repo (see .gitignore); fetch NWB files from
-# DANDI 001336 into data/DANDI_001336/, then:
-SHELL_MEA_DATA_ROOT="$PWD/data/DANDI_001336" \
-SHELL_MEA_FIGURES_DIR="$PWD/figures" \
+# DANDI 001336 into data/DANDI_001336/, then simply:
 .venv/bin/python shell_mea_twin_pipeline.py
 ```
 
-Without `SHELL_MEA_FIGURES_DIR` the script keeps its original behaviour
-(timestamped run folders under `SHELL_MEA_OUTPUT_ROOT` / the Colab Drive
-path).
+When `data/DANDI_001336/` exists next to the script, it is the default data
+root and all plots go to `figures/` - no environment variables needed.
+`SHELL_MEA_DATA_ROOT`, `SHELL_MEA_FIGURES_DIR` and `SHELL_MEA_OUTPUT_ROOT`
+still override the defaults, and without a local data folder the script keeps
+its original Colab behaviour (timestamped run folders on Drive).
+
+Per twinned state, `figures/<subject>/twinning/<state>/` contains
+`twin_report.png` (objectives dashboard), `ga_pareto_convergence.png`
+(NSGA-III Pareto front + convergence), `twin_activity_traces.png`
+(paper Fig. 4-style organoid-vs-twin firing-rate traces and PSDs) and
+`twin_params.json` (full twin + optimiser provenance).

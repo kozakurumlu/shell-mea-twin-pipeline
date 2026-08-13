@@ -8,3 +8,4 @@ __pycache__/
 
 # OS noise
 .DS_Store
+pipeline_run.log
