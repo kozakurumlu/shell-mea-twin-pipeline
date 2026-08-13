@@ -14,14 +14,22 @@ folded shell MEA ([DANDI 001336](https://dandiarchive.org/dandiset/001336)):
    - each candidate is simulated for 15 independent noise realisations and
      each objective is the RMSE over those trials (paper Eqn. 3), normalised
      by its target, `F = RMSE / (target + eps)`;
-   - three objectives stay separate for NSGA-III: population firing rate,
-     dominant envelope oscillation frequency, envelope spectral containment;
+   - FIVE objectives stay separate for NSGA-III: population firing rate;
+     dominant-oscillation mismatch (peak-frequency error when the organoid
+     has a real interior spectral peak, spurious-peak fraction when it does
+     not - bursty 1/f states are reported explicitly as "no dominant
+     oscillation"); envelope spectral containment; a teacher-forced
+     synchronisation loss (the same reservoir driven by the organoid envelope
+     must track it through a ridge readout on held-out data - generalized
+     synchronisation); and a Wasserstein rate-distribution loss that matches
+     fluctuation/burst amplitude;
    - 25 generations x generation size 50, Das-Dennis reference directions,
      SBX (eta=30, p=1.0) crossover, polynomial mutation (eta=20)
      (Deb & Jain 2014 settings);
    - the twin is the Pareto-front member with the lowest composite RMSE
-     `sqrt(sum_j F_j^2)`; the per-generation convergence trace and Pareto
-     front are saved per state (`ga_pareto_convergence.png`).
+     `sqrt(mean_j F_j^2)` (RMS of the normalised RMSEs); the per-generation
+     convergence trace and Pareto front are saved per state
+     (`ga_pareto_convergence.png`).
    Global RRN parameters and the recurrent weights (on a fixed sparse
    skeleton) are evolved jointly.
 3. **CEBRA validation** — latent embeddings of organoid vs twin activity,

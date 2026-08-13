@@ -19,9 +19,15 @@ Narrative
      - each candidate parameter set is simulated for TWIN_N_TRIALS independent
        noise realisations and each objective is the RMSE over those trials
        (paper Eqn. 3), normalised by its target, F = RMSE/(target + eps);
-     - the three objectives are kept SEPARATE for NSGA-III - (a) population
-       firing rate, (b) dominant oscillation frequency of the population-rate
-       envelope, (c) envelope spectral containment;
+     - FIVE objectives are kept SEPARATE for NSGA-III - (a) population firing
+       rate, (b) dominant-oscillation mismatch (peak-frequency error when the
+       organoid has a real interior spectral peak; spurious-peak fraction when
+       it does not - bursty 1/f states are handled explicitly), (c) envelope
+       spectral containment, (d) teacher-forced synchronisation loss (the same
+       reservoir driven by the organoid envelope must track it via a ridge
+       readout on held-out data - generalized synchronisation), (e) a
+       Wasserstein rate-distribution loss that matches fluctuation/burst
+       amplitude so flat twins are penalised;
      - NSGA-III (Das-Dennis reference directions, SBX eta=30/p=1.0,
        polynomial mutation eta=20, i.e. Deb & Jain 2014 settings) runs for
        TWIN_N_GEN generations with generation size TWIN_POP_SIZE (paper: 25
@@ -62,6 +68,7 @@ import plotly.graph_objects as go
 
 from pynwb import NWBHDF5IO
 from scipy.signal import butter, sosfiltfilt, find_peaks, welch, detrend
+from scipy.stats import wasserstein_distance
 from scipy.sparse import random as sparse_random, csr_matrix
 from scipy.special import expit
 from scipy.sparse.linalg import eigs
@@ -121,13 +128,24 @@ TWIN_K = 12              # FIXED resonator count -> fixed weight-matrix dimensio
 TWIN_FSTEP = (TWIN_FMAX - TWIN_FMIN) / (TWIN_K - 1)  # frange is linspace, not arange
 TWIN_SKELETON_SPARSITY = 0.35  # fixed recurrent-connectivity density (the skeleton)
 TWIN_PEAK_BAND = (0.03, 0.45)  # band for dominant-frequency target
-TWIN_SIGMA = 0.005       # RRN paper default (noise-driven spontaneous dynamics)
+TWIN_PEAK_MIN_RATIO = 1.5      # a dominant peak must top this x band-median
+                               # power; also must be an INTERIOR local max, so
+                               # a monotone 1/f decay (argmax on the band edge)
+                               # is explicitly "no dominant oscillation"
+TWIN_SIGMA = 0.005       # default noise scale (also an evolvable gene now:
+                         # fluctuation/burst amplitude needs a knob)
+TWIN_BURNIN_S = 30       # reservoir washout (s) discarded from every sim:
+                         # the zero-state equilibration transient must not
+                         # reach the objectives (the exp readout would turn
+                         # it into a fake burst) or the figures
+TWIN_SYNC_TRAIN_FRAC = 0.7  # ridge-readout train fraction for the sync loss
 # --- NSGA-III settings following Sethi, Faraz & Wong-Lin (arXiv:2605.25224) ---
 TWIN_N_GEN = 25          # generations (paper: 25, chosen on convergence; the
                          # per-generation convergence trace is saved to check)
 TWIN_POP_SIZE = 50       # generation size (paper: 50)
-TWIN_REF_PARTITIONS = 8  # Das-Dennis partitions for 3 objectives -> C(10,2)=45
-                         # reference directions <= pop size
+TWIN_REF_PARTITIONS = 3  # Das-Dennis partitions for the FIVE objectives
+                         # (rate, dom-osc, spectrum, sync, distribution)
+                         # -> C(3+4,4)=35 reference directions <= pop size
 TWIN_N_TRIALS = 15       # independent noise realisations per parameter set;
                          # each objective is the RMSE over these trials (paper
                          # Eqn. 3; their Case-1 setting). Trials are batched in
@@ -802,8 +820,45 @@ def _plot_ppglm_3d_fallback(positions, active_channels, edges, node_strengths, t
 # =============================================================================
 # KongFatt-style twinning: targets and objectives
 # =============================================================================
+def _dominant_freq(band_freqs, band_psd):
+    """Frequency of the dominant spectral peak, or None when there is none.
+
+    A real dominant oscillation must be (a) an INTERIOR local maximum of the
+    band - the band argmax sitting on an edge bin means a monotone 1/f-type
+    decay, where the old argmax rule wrongly returned the lowest bin - and
+    (b) meaningfully above the spectrum floor (>= TWIN_PEAK_MIN_RATIO x the
+    band median power). Returns None for "no dominant oscillation".
+    """
+    band_psd = np.asarray(band_psd, dtype=float)
+    if band_psd.size < 3:
+        return None
+    # Edge-corrected 3-bin moving average: single-bin estimator spikes cannot
+    # fake a peak. (A plain mode='same' average would bias the edge bins down
+    # and shift a monotone spectrum's argmax to bin 1 - must divide by the
+    # actual kernel coverage instead.)
+    kernel = np.ones(3)
+    sm = (np.convolve(band_psd, kernel, mode='same')
+          / np.convolve(np.ones_like(band_psd), kernel, mode='same'))
+    i = int(np.argmax(sm))
+    if i == 0 or i == sm.size - 1:
+        return None
+    med = float(np.median(sm))
+    if med <= 0 or sm[i] < TWIN_PEAK_MIN_RATIO * med:
+        return None
+    return float(band_freqs[i])
+
+
+def _fmt_hz(v):
+    return f"{v:.4f} Hz" if v is not None else "none"
+
+
 def compute_twin_targets(pop_env):
-    """KongFatt observables: mean population rate + dominant envelope frequency."""
+    """KongFatt observables: mean population rate + dominant envelope frequency.
+
+    `target_freq` is None when the state has no dominant oscillation (bursty
+    1/f-type spectrum); twinning still runs, with the oscillation objective
+    flipped to penalising spurious twin peaks.
+    """
     fs_env = 1.0 / ENV_BIN_S
     target_rate = float(np.mean(pop_env))
     x = detrend(pop_env.astype(np.float64))
@@ -814,14 +869,22 @@ def compute_twin_targets(pop_env):
         return None
     band_freqs = freqs[band]
     band_psd = psd[band]
-    target_freq = float(band_freqs[np.argmax(band_psd)])
+    target_freq = _dominant_freq(band_freqs, band_psd)
     psd_norm = band_psd / np.sum(band_psd)
     return {'target_rate': target_rate, 'target_freq': target_freq,
+            'has_oscillation': target_freq is not None,
             'psd_freqs': band_freqs, 'psd_norm': psd_norm, 'nperseg': nperseg}
 
 
-def simulate_twin(params, T, skeleton=None, W_values=None, n_trials=1):
-    """Autonomous RRN twin: sinusoidal rhythmic drive + noise, no data input.
+def simulate_twin(params, T, skeleton=None, W_values=None, n_trials=1,
+                  input_env=None):
+    """RRN twin simulation: autonomous by default, coupled when teacher-forced.
+
+    Autonomous mode (input_env=None): sinusoidal rhythmic drive + noise, no
+    data input - the twin GENERATES the state. Coupled mode (input_env=the
+    organoid envelope): the drive is replaced by the z-scored organoid
+    envelope scaled by params['sync_gain'] - master-slave coupling for the
+    generalized-synchronisation objective.
 
     With `skeleton`+`W_values` the recurrent matrix uses the evolved nonzero
     weights on a fixed skeleton (KongFatt-style connectivity evolution); without
@@ -833,38 +896,79 @@ def simulate_twin(params, T, skeleton=None, W_values=None, n_trials=1):
     objectives are deterministic in the parameters, which stabilises the GA.
 
     Returns (activity, amplitudes, frange): activity is (n_trials, T) per-trial
-    population activity; amplitudes is trial 0's (T, K) resonator amplitudes.
+    population activity; amplitudes is (n_trials, T, K) resonator amplitudes.
     """
     rrn = ReservoirNetwork(
-        Fs=1.0 / ENV_BIN_S, sigma=TWIN_SIGMA, sparsity=TWIN_SKELETON_SPARSITY,
+        Fs=1.0 / ENV_BIN_S, sigma=float(params.get('sigma', TWIN_SIGMA)),
+        sparsity=TWIN_SKELETON_SPARSITY,
         spectral_radius=params['spectral_radius'],
         base_geometric_ratio=params['base_geometric_ratio'],
         random_state=TWIN_SEED, skeleton=skeleton)
     if skeleton is not None and W_values is not None:
         rrn.build_W_res(W_values, params['spectral_radius'])
-    t = np.arange(T) * ENV_BIN_S
-    u = (params['drive_amp'] * np.sin(2 * np.pi * params['drive_freq'] * t)
-         ).reshape(-1, 1)
-    _, amplitudes = rrn.collect_states(u, n_trials=n_trials)  # (B, T, K)
+    burn = int(round(TWIN_BURNIN_S / ENV_BIN_S))
+    if input_env is not None:
+        e = np.asarray(input_env, dtype=np.float64)[:T]
+        e = (e - e.mean()) / (e.std() + 1e-12)
+        u_core = float(params.get('sync_gain', 1.0)) * e
+        head = u_core[0] if u_core.size else 0.0
+        u = np.concatenate([np.full(burn, head), u_core]).reshape(-1, 1)
+    else:
+        t = np.arange(T + burn) * ENV_BIN_S
+        u = (params['drive_amp'] * np.sin(2 * np.pi * params['drive_freq'] * t)
+             ).reshape(-1, 1)
+    _, amplitudes = rrn.collect_states(u, n_trials=n_trials)  # (B, T+burn, K)
+    amplitudes = amplitudes[:, burn:]  # discard zero-state equilibration
     activity = amplitudes.mean(axis=2)  # (B, T) population activity per trial
-    return activity, amplitudes[0], rrn.frange
+    return activity, amplitudes, rrn.frange
+
+
+def twin_rate_traces(params, activity):
+    """Twin population-rate traces (Hz) from raw reservoir activity.
+
+    LNP-style log-normal readout: rate = output_gain * exp(beta * z(activity))
+    per trial. For small beta, exp(beta*z) ~ 1 + beta*z - the old linear
+    readout up to an affine rescale - while larger beta turns the same
+    Gaussian-ish reservoir fluctuations into rare multiplicative bursts,
+    giving the Wasserstein objective a heavy-tail knob for bursty organoid
+    states that a linear readout structurally cannot reach.
+    """
+    act = np.asarray(activity, dtype=np.float64)
+    mu = act.mean(axis=-1, keepdims=True)
+    sd = act.std(axis=-1, keepdims=True)
+    z = (act - mu) / (sd + 1e-12)
+    beta = float(params.get('burst_beta', 0.0))
+    return float(params['output_gain']) * np.exp(beta * z)
 
 
 def _twin_metrics(params, pop_env, targets, skeleton=None, W_values=None,
                   n_trials=None):
     """Return metric dict or None if the twin diverged/died.
 
-    Paper-faithful objectives (Sethi, Faraz & Wong-Lin, arXiv:2605.25224):
+    Paper-faithful objective form (Sethi, Faraz & Wong-Lin, arXiv:2605.25224):
     each candidate is simulated for `n_trials` independent noise realisations
     and each objective is the RMSE over trials (Eqn. 3),
 
         RMSE_x = sqrt( (1/N) * sum_i (x_i - x_target)^2 ),
 
-    normalised by its target, F_x = RMSE_x / (x_target + eps). The three
-    normalised RMSEs (rate, dominant frequency, spectral containment with
-    target containment 1) stay SEPARATE as the NSGA-III objectives; `overall`
-    is the composite - the RMS of the normalised RMSEs, sqrt(mean_j F_j^2)
-    (paper Sec. III) - used afterwards to pick one twin off the Pareto front.
+    normalised by its target, F_x = RMSE_x / (x_target + eps). FIVE normalised
+    RMSEs stay SEPARATE as the NSGA-III objectives:
+      F_rate: time-averaged population firing rate.
+      F_osc : dominant-oscillation mismatch. With a real organoid peak:
+              per-trial peak-frequency error (a peakless twin trial scores the
+              full band width). With NO organoid peak (bursty 1/f state): the
+              fraction of trials showing a spurious dominant peak.
+      F_spec: 1 - spectral containment (normalised band-PSD overlap).
+      F_sync: teacher-forced synchronisation loss 1 - r: the same reservoir,
+              driven by the organoid envelope (master-slave coupling with
+              evolvable gain), must track it through a ridge readout scored on
+              held-out data - generalized-synchronisation capacity.
+      F_dist: Wasserstein-1 distance between organoid and twin firing-rate
+              distributions (Hz) / target rate - matches fluctuation/burst
+              amplitude, which mean rate + normalised PSD shape both miss.
+    `overall` is the composite - the RMS of the normalised RMSEs,
+    sqrt(mean_j F_j^2) (paper Sec. III) - used afterwards to pick one twin
+    off the Pareto front.
     """
     if n_trials is None:
         n_trials = TWIN_N_TRIALS
@@ -874,8 +978,11 @@ def _twin_metrics(params, pop_env, targets, skeleton=None, W_values=None,
                                        n_trials=n_trials)  # (B, T)
         if not np.all(np.isfinite(activity)) or np.any(activity.std(axis=1) < 1e-12):
             return None  # diverged or dead twin in any trial
-        rates = params['output_gain'] * activity.mean(axis=1)  # (B,)
-        x = detrend(activity.astype(np.float64), axis=1)
+        rate_traces = twin_rate_traces(params, activity)  # (B, T) in Hz
+        rates = rate_traces.mean(axis=1)  # (B,)
+        # spectrum/oscillation/distribution all measured on the RATE traces,
+        # matching what the organoid side (its rate envelope) provides
+        x = detrend(rate_traces, axis=1)
         freqs, psd = welch(x, fs=1.0 / ENV_BIN_S, nperseg=targets['nperseg'],
                            axis=1)  # psd is (B, n_freqs)
         band = (freqs >= TWIN_PEAK_BAND[0]) & (freqs <= TWIN_PEAK_BAND[1])
@@ -884,44 +991,96 @@ def _twin_metrics(params, pop_env, targets, skeleton=None, W_values=None,
         if not np.any(band) or not np.all(band_tot > 0):
             return None
         band_freqs = freqs[band]
-        twin_freqs = band_freqs[np.argmax(band_psd, axis=1)]  # (B,)
         twin_psd_norm = band_psd / band_tot[:, None]
+        # per-trial dominant peak with the interior/prominence criterion
+        twin_freqs = [_dominant_freq(band_freqs, row) for row in twin_psd_norm]
         org_psd = targets['psd_norm']
-        m = min(org_psd.size, twin_psd_norm.shape[1])
-        containments = np.minimum(org_psd[None, :m],
-                                  twin_psd_norm[:, :m]).sum(axis=1)  # (B,)
+        m_bins = min(org_psd.size, twin_psd_norm.shape[1])
+        containments = np.minimum(org_psd[None, :m_bins],
+                                  twin_psd_norm[:, :m_bins]).sum(axis=1)  # (B,)
 
-        # Eqn. 3 RMSE over trials, then the paper's target normalisation.
+        # --- Eqn. 3 RMSE over trials, target-normalised, per objective ---
         rmse_rate = np.sqrt(np.mean((rates - targets['target_rate']) ** 2))
-        rmse_freq = np.sqrt(np.mean((twin_freqs - targets['target_freq']) ** 2))
-        rmse_spec = np.sqrt(np.mean((1.0 - containments) ** 2))
-        F = np.array([
-            rmse_rate / (targets['target_rate'] + TWIN_RMSE_EPS),
-            rmse_freq / (targets['target_freq'] + TWIN_RMSE_EPS),
-            rmse_spec / 1.0,  # containment target is 1, already normalised
-        ])
+        F_rate = rmse_rate / (targets['target_rate'] + TWIN_RMSE_EPS)
+
+        band_span = TWIN_PEAK_BAND[1] - TWIN_PEAK_BAND[0]
+        if targets['target_freq'] is not None:
+            # organoid oscillates: per-trial peak error; a peakless twin
+            # trial scores the full band width
+            errs = np.array([abs(f - targets['target_freq']) if f is not None
+                             else band_span for f in twin_freqs])
+            F_osc = (np.sqrt(np.mean(errs ** 2))
+                     / (targets['target_freq'] + TWIN_RMSE_EPS))
+        else:
+            # no organoid oscillation: penalise spurious twin peaks
+            spurious = np.array([0.0 if f is None else 1.0 for f in twin_freqs])
+            F_osc = float(np.sqrt(np.mean(spurious ** 2)))
+
+        F_spec = float(np.sqrt(np.mean((1.0 - containments) ** 2)))
+
+        # --- teacher-forced synchronisation loss (reservoir observer) ---
+        # The SAME reservoir is re-run driven by the organoid envelope
+        # (master-slave coupling); a ridge readout of resonator amplitudes is
+        # fit on the first TWIN_SYNC_TRAIN_FRAC and scored on the held-out
+        # tail: per-trial statistic r with target 1, Eqn. 3 form.
+        _, amps_c, _ = simulate_twin(params, T, skeleton, W_values,
+                                     n_trials=n_trials, input_env=pop_env)
+        split = min(max(int(TWIN_SYNC_TRAIN_FRAC * T), 2), T - 2)
+        K = amps_c.shape[2]
+        reader = Ridge(alpha=1.0).fit(
+            amps_c[:, :split].reshape(-1, K).astype(np.float64),
+            np.tile(pop_env[:split], n_trials))
+        yte = pop_env[split:].astype(np.float64)
+        rs = np.zeros(n_trials)
+        if np.std(yte) > 1e-12:
+            for b in range(n_trials):
+                pred = reader.predict(amps_c[b, split:].astype(np.float64))
+                if np.std(pred) > 1e-12:
+                    r = float(np.corrcoef(pred, yte)[0, 1])
+                    rs[b] = r if np.isfinite(r) else 0.0
+        F_sync = float(np.sqrt(np.mean((1.0 - rs) ** 2)))
+
+        # --- burst-statistics loss: Wasserstein-1 between rate histograms ---
+        # Time-shift invariant, so the AUTONOMOUS twin can satisfy it; this is
+        # the term that forbids a flat twin at the right mean rate.
+        wass = np.array([wasserstein_distance(pop_env, r)
+                         for r in rate_traces])
+        F_dist = float(np.sqrt(np.mean(wass ** 2))
+                       / (targets['target_rate'] + TWIN_RMSE_EPS))
+
+        F = np.array([F_rate, F_osc, F_spec, F_sync, F_dist], dtype=float)
         if not np.all(np.isfinite(F)):
             return None
         F = np.minimum(F, TWIN_F_CAP)
         overall = float(np.sqrt(np.mean(F ** 2)))  # RMS of the normalised RMSEs
+        tf = [f for f in twin_freqs if f is not None]
         return {'pred_rate': float(rates.mean()),
-                'twin_freq': float(np.median(twin_freqs)),
+                'twin_freq': (float(np.median(tf)) if tf else None),
                 'containment': float(containments.mean()),
+                'sync_r': float(rs.mean()),
+                'wasserstein_hz': float(wass.mean()),
                 'rmse_rate': float(F[0]), 'rmse_freq': float(F[1]),
-                'rmse_spec': float(F[2]), 'overall': overall}
+                'rmse_spec': float(F[2]), 'rmse_sync': float(F[3]),
+                'rmse_dist': float(F[4]), 'overall': overall}
     except Exception:
         return None
 
 
 # Global twin parameters searched by NSGA-III (the recurrent-weight VALUES are
-# added as extra free variables on a fixed skeleton; see run_twinning). The two
+# added as extra free variables on a fixed skeleton; see run_twinning). The
 # log-uniform variables are searched in log10 space then exponentiated back.
+# 'sigma' (noise scale) controls autonomous fluctuation/burst amplitude for
+# the distribution objective; 'sync_gain' is the master-slave coupling gain
+# used only in the teacher-forced synchronisation pass.
 TWIN_PARAM_SPECS = [
     ('drive_freq', 0.03, 0.45, None),
     ('drive_amp', 1e-3, 5.0, 'log'),
     ('base_geometric_ratio', 0.70, 0.99, None),
     ('spectral_radius', 0.05, 1.2, None),
     ('output_gain', 1e-3, 1e3, 'log'),
+    ('sigma', 1e-4, 1.0, 'log'),
+    ('sync_gain', 1e-2, 1e1, 'log'),
+    ('burst_beta', 1e-2, 3.0, 'log'),
 ]
 
 
@@ -965,7 +1124,9 @@ def run_twinning(pop_env):
         print("      Could not compute twin targets; skipping")
         return None
     print(f"      Targets: rate={targets['target_rate']:.4f} Hz, "
-          f"dom. freq={targets['target_freq']:.4f} Hz")
+          f"dom. freq={_fmt_hz(targets['target_freq'])}"
+          + ("" if targets['target_freq'] is not None
+             else " (1/f-type spectrum: matching profile, bursts and sync)"))
 
     try:
         from pymoo.core.problem import ElementwiseProblem
@@ -992,7 +1153,7 @@ def run_twinning(pop_env):
     xl_spec, xu_spec = _specs_to_bounds()
     xl = np.concatenate([xl_spec, np.full(n_w, -1.0)])
     xu = np.concatenate([xu_spec, np.full(n_w, 1.0)])
-    ref_dirs = get_reference_directions("das-dennis", 3,
+    ref_dirs = get_reference_directions("das-dennis", 5,
                                         n_partitions=TWIN_REF_PARTITIONS)
 
     # Running best-ever composite individual, recorded at EVALUATION time:
@@ -1002,21 +1163,22 @@ def run_twinning(pop_env):
 
     class _TwinProblem(ElementwiseProblem):
         def __init__(self):
-            super().__init__(n_var=len(xl), n_obj=3, n_ieq_constr=0, xl=xl, xu=xu)
+            super().__init__(n_var=len(xl), n_obj=5, n_ieq_constr=0, xl=xl, xu=xu)
 
         def _evaluate(self, X, out, *args, **kwargs):
             params = _vec_to_params(X[:n_g])
             W_values = X[n_g:]
             m = _twin_metrics(params, pop_env, targets, skeleton, W_values)
             if m is not None:
-                Fv = np.array([m['rmse_rate'], m['rmse_freq'], m['rmse_spec']])
+                Fv = np.array([m['rmse_rate'], m['rmse_freq'], m['rmse_spec'],
+                               m['rmse_sync'], m['rmse_dist']])
                 comp = float(np.sqrt(np.mean(Fv ** 2)))
                 if comp < best_seen['comp']:
                     best_seen.update(comp=comp, X=np.array(X, dtype=float), F=Fv)
                 out["F"] = Fv
             else:
                 # penalise failed sims with a dominated vector
-                out["F"] = np.full(3, TWIN_FAIL_F)
+                out["F"] = np.full(5, TWIN_FAIL_F)
 
     class _ConvergenceLog(Callback):
         """Per-generation composite-RMSE trace (paper: generations chosen on
@@ -1087,7 +1249,9 @@ def run_twinning(pop_env):
         print("      Optimisation failed to find a valid twin")
         return None
     details = {k: m[k] for k in ('pred_rate', 'twin_freq', 'containment',
-                                 'rmse_rate', 'rmse_freq', 'rmse_spec', 'overall')}
+                                 'sync_r', 'wasserstein_hz',
+                                 'rmse_rate', 'rmse_freq', 'rmse_spec',
+                                 'rmse_sync', 'rmse_dist', 'overall')}
     optimiser = {
         'algorithm': 'NSGA-III (Sethi, Faraz & Wong-Lin, arXiv:2605.25224)',
         'pop_size': TWIN_POP_SIZE, 'n_gen': TWIN_N_GEN,
@@ -1095,16 +1259,20 @@ def run_twinning(pop_env):
         'ref_dirs': f'das-dennis p={TWIN_REF_PARTITIONS} ({ref_dirs.shape[0]} dirs)',
         'crossover': 'SBX(eta=30, prob=1.0)', 'mutation': 'PM(eta=20, prob=1/n_var)',
         'n_var': int(len(xl)), 'n_recurrent_weights': int(n_w),
-        'objectives': 'F = RMSE_over_trials/(target+eps): rate, dom_freq, 1-containment',
+        'objectives': ('F = RMSE_over_trials/(target+eps): rate, dominant-osc '
+                       '(spurious-peak fraction when organoid has none), '
+                       '1-containment, sync (1-r teacher-forced ridge readout), '
+                       'Wasserstein rate-distribution / target rate'),
+        'organoid_has_oscillation': bool(targets['target_freq'] is not None),
         'composite': 'sqrt(mean_j F_j^2) (RMS of normalised RMSEs)',
         'seed': RANDOM_SEED,
     }
     print(f"      Best composite RMSE sqrt(mean F^2): {m['overall']:.4f} | "
           f"rate {m['pred_rate']:.4f} vs {targets['target_rate']:.4f} Hz | "
-          f"freq {m['twin_freq']:.4f} vs {targets['target_freq']:.4f} Hz | "
-          f"containment {m['containment']:.3f} | front size {len(F)} | "
-          f"recurrent weights {n_w} | {TWIN_POP_SIZE}x{TWIN_N_GEN} gens, "
-          f"{TWIN_N_TRIALS} trials/eval")
+          f"freq {_fmt_hz(m['twin_freq'])} vs {_fmt_hz(targets['target_freq'])} | "
+          f"containment {m['containment']:.3f} | sync r {m['sync_r']:.3f} | "
+          f"wass {m['wasserstein_hz']:.3f} Hz | front size {len(F)} | "
+          f"{TWIN_POP_SIZE}x{TWIN_N_GEN} gens, {TWIN_N_TRIALS} trials/eval")
     return {'params': best_params, 'targets': targets, 'details': details,
             'overall': m['overall'], 'skeleton': skeleton, 'W_values': best_W,
             'pareto_F': F.tolist(), 'pareto_agg': agg.tolist(),
@@ -1117,13 +1285,14 @@ def plot_twin_report(twin, pop_env, title, output_path, skeleton=None, W_values=
     params, targets, details = twin['params'], twin['targets'], twin['details']
     activity, amplitudes, frange = simulate_twin(
         params, len(pop_env), skeleton, W_values, n_trials=TWIN_N_TRIALS)
+    rate_traces = twin_rate_traces(params, activity)  # (B, T) in Hz
 
     fig, axes = plt.subplots(2, 2, figsize=(16, 10))
 
     ax = axes[0, 0]
     t = np.arange(len(pop_env)) * ENV_BIN_S
     org_n = (pop_env - pop_env.mean()) / (pop_env.std() + 1e-10)
-    act0 = activity[0]
+    act0 = rate_traces[0]
     act_n = (act0 - act0.mean()) / (act0.std() + 1e-10)
     ax.plot(t, org_n, 'b-', lw=0.8, alpha=0.8, label='Organoid rate envelope')
     ax.plot(t, act_n, 'r-', lw=0.8, alpha=0.8,
@@ -1135,7 +1304,7 @@ def plot_twin_report(twin, pop_env, title, output_path, skeleton=None, W_values=
     ax = axes[0, 1]
     ax.semilogy(targets['psd_freqs'], targets['psd_norm'], 'b-', lw=1.5,
                 label='Organoid')
-    x = detrend(activity.astype(np.float64), axis=1)
+    x = detrend(rate_traces, axis=1)
     freqs, psd = welch(x, fs=1.0 / ENV_BIN_S, nperseg=targets['nperseg'], axis=1)
     band = (freqs >= TWIN_PEAK_BAND[0]) & (freqs <= TWIN_PEAK_BAND[1])
     band_psd = psd[:, band]
@@ -1144,16 +1313,20 @@ def plot_twin_report(twin, pop_env, title, output_path, skeleton=None, W_values=
         ax.semilogy(freqs[band], row, 'r-', lw=0.5, alpha=0.25)
     ax.semilogy(freqs[band], band_norm.mean(axis=0), 'r-', lw=1.5,
                 label=f'Twin (mean of {TWIN_N_TRIALS} trials)')
-    ax.axvline(targets['target_freq'], color='blue', ls='--', lw=1,
-               label=f"target {targets['target_freq']:.3f} Hz")
-    ax.axvline(details['twin_freq'], color='red', ls='--', lw=1,
-               label=f"twin {details['twin_freq']:.3f} Hz")
+    if targets['target_freq'] is not None:
+        ax.axvline(targets['target_freq'], color='blue', ls='--', lw=1,
+                   label=f"target {targets['target_freq']:.3f} Hz")
+    if details['twin_freq'] is not None:
+        ax.axvline(details['twin_freq'], color='red', ls='--', lw=1,
+                   label=f"twin {details['twin_freq']:.3f} Hz")
     ax.set_xlabel('Frequency (Hz)'); ax.set_ylabel('Normalised PSD')
-    ax.set_title('Dominant oscillation (KongFatt objective)')
+    ax.set_title('Dominant oscillation (KongFatt objective)'
+                 if targets['target_freq'] is not None else
+                 'Spectral profile (no dominant oscillation in organoid)')
     ax.legend(fontsize=8); ax.grid(True, alpha=0.3)
 
     ax = axes[1, 0]
-    recruitment = amplitudes.mean(axis=0)
+    recruitment = amplitudes.mean(axis=(0, 1))  # mean over trials and time
     ax.stem(frange, recruitment, linefmt='g-', markerfmt='go', basefmt=' ')
     ax.set_xscale('log')
     ax.set_xlabel('Resonator frequency (Hz)'); ax.set_ylabel('Mean amplitude')
@@ -1163,20 +1336,26 @@ def plot_twin_report(twin, pop_env, title, output_path, skeleton=None, W_values=
     ax = axes[1, 1]
     ax.axis('off')
     summary = (
-        f"KongFatt objectives, RMSE over {TWIN_N_TRIALS} trials / target (Eqn. 3)\n"
+        f"Objectives, RMSE over {TWIN_N_TRIALS} trials / target (Eqn. 3)\n"
         f"  Population rate:  {targets['target_rate']:.4f} -> {details['pred_rate']:.4f} Hz "
         f"(F {details['rmse_rate']:.3f})\n"
-        f"  Dominant freq:    {targets['target_freq']:.4f} -> {details['twin_freq']:.4f} Hz "
-        f"(F {details['rmse_freq']:.3f})\n"
+        f"  Dominant osc:     {_fmt_hz(targets['target_freq'])} -> "
+        f"{_fmt_hz(details['twin_freq'])} (F {details['rmse_freq']:.3f})\n"
         f"  PSD containment:  {details['containment']:.3f} "
         f"(F {details['rmse_spec']:.3f})\n"
+        f"  Sync (ridge r):   {details['sync_r']:.3f} "
+        f"(F {details['rmse_sync']:.3f})\n"
+        f"  Rate Wasserstein: {details['wasserstein_hz']:.3f} Hz "
+        f"(F {details['rmse_dist']:.3f})\n"
         f"  COMPOSITE sqrt(mean F^2): {details['overall']:.4f}\n"
-        f"  NSGA-III: pop {TWIN_POP_SIZE} x {TWIN_N_GEN} gens "
-        f"(arXiv:2605.25224 settings)\n\n"
+        f"  NSGA-III: pop {TWIN_POP_SIZE} x {TWIN_N_GEN} gens, 5 objectives\n\n"
         f"Twin parameters\n"
         f"  drive_freq={params['drive_freq']:.4f} Hz, drive_amp={params['drive_amp']:.3f}\n"
         f"  bgr={params['base_geometric_ratio']:.3f}, sr={params['spectral_radius']:.3f}\n"
-        f"  output_gain={params['output_gain']:.3f}, sigma={TWIN_SIGMA} (fixed)\n"
+        f"  output_gain={params['output_gain']:.3f}, "
+        f"sigma={params.get('sigma', TWIN_SIGMA):.4f} (evolved), "
+        f"sync_gain={params.get('sync_gain', 1.0):.3f}, "
+        f"burst_beta={params.get('burst_beta', 0.0):.3f}\n"
         f"  recurrent weights: {len(skeleton[0]) if skeleton else 'random skeleton'}"
         f" nonzero on fixed skeleton (evolved)")
     ax.text(0.05, 0.95, summary, transform=ax.transAxes, fontsize=10,
@@ -1190,22 +1369,41 @@ def plot_twin_report(twin, pop_env, title, output_path, skeleton=None, W_values=
 
 
 def plot_ga_report(twin, title, output_path):
-    """NSGA-III optimisation report a la the paper's Figs. 3D/5C: pairwise
-    Pareto-front projections coloured by composite RMSE (darker = lower, best
-    member arrowed) plus the per-generation convergence trace that justifies
-    the generation count."""
+    """NSGA-III optimisation report a la the paper's Figs. 3D/5C, extended to
+    the five-objective problem: parallel-coordinates view of the Pareto front
+    coloured by composite RMSE (darker = lower), the two most informative
+    pairwise projections with the selected twin starred, and the
+    per-generation convergence trace that justifies the generation count."""
     F = np.asarray(twin.get('pareto_F', []), dtype=float)
     agg = np.asarray(twin.get('pareto_agg', []), dtype=float)
     conv = twin.get('convergence', {}) or {}
     if F.ndim != 2 or F.size == 0 or agg.size != F.shape[0]:
         return
     best_i = int(twin.get('best_index', int(np.argmin(agg))))
+    n_obj = F.shape[1]
+    names = ['F rate', 'F dom osc', 'F spectral', 'F sync', 'F dist'][:n_obj]
 
-    fig, axes = plt.subplots(2, 2, figsize=(14, 11))
-    names = ['F firing rate', 'F dominant freq', 'F spectral containment']
-    pairs = [(0, 1), (0, 2), (1, 2)]
+    fig, axes = plt.subplots(2, 2, figsize=(15, 11))
     order = np.argsort(-agg)  # draw worse (lighter) first so best stays on top
-    for ax, (i, j) in zip(axes.flat[:3], pairs):
+    cmap = plt.get_cmap('Purples_r')
+    a_lo, a_hi = float(agg.min()), float(agg.max())
+    span = (a_hi - a_lo) or 1.0
+
+    ax = axes[0, 0]
+    xs = np.arange(n_obj)
+    for k in order:
+        ax.plot(xs, F[k], color=cmap((agg[k] - a_lo) / span), lw=1.0,
+                alpha=0.65)
+    ax.plot(xs, F[best_i], color='purple', lw=2.6, marker='o',
+            label='lowest composite RMSE')
+    ax.set_xticks(xs)
+    ax.set_xticklabels(names, fontsize=9)
+    ax.set_ylabel('Normalised RMSE F')
+    ax.set_title('Pareto front, parallel coordinates (darker = lower composite)')
+    ax.legend(fontsize=9)
+    ax.grid(True, alpha=0.3)
+
+    for ax, (i, j) in zip((axes[0, 1], axes[1, 0]), ((0, 1), (3, 4))):
         sc = ax.scatter(F[order, i], F[order, j], c=agg[order], cmap='Purples_r',
                         s=48, edgecolors='black', linewidths=0.4)
         ax.scatter([F[best_i, i]], [F[best_i, j]], marker='*', s=380,
@@ -1256,7 +1454,7 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
     params, targets, details = twin['params'], twin['targets'], twin['details']
     activity, _, _ = simulate_twin(params, len(pop_env), skeleton, W_values,
                                    n_trials=TWIN_N_TRIALS)
-    rate_traces = params['output_gain'] * activity  # (n_trials, T), in Hz
+    rate_traces = twin_rate_traces(params, activity)  # (n_trials, T), in Hz
     t = np.arange(len(pop_env)) * ENV_BIN_S
 
     fig, (ax_a, ax_b) = plt.subplots(2, 1, figsize=(14, 9))
@@ -1278,7 +1476,7 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
     ax_a.legend(fontsize=9, ncol=2)
     ax_a.grid(True, alpha=0.3)
 
-    x = detrend(activity.astype(np.float64), axis=1)
+    x = detrend(rate_traces, axis=1)
     freqs, psd = welch(x, fs=1.0 / ENV_BIN_S, nperseg=targets['nperseg'], axis=1)
     band = (freqs >= TWIN_PEAK_BAND[0]) & (freqs <= TWIN_PEAK_BAND[1])
     band_psd = psd[:, band]
@@ -1289,13 +1487,21 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
               lw=1.6, label='Organoid PSD')
     ax_b.plot(freqs[band], band_norm.mean(axis=0), color='crimson', lw=1.6,
               label='Twin PSD (trial mean)')
-    ax_b.axvline(targets['target_freq'], color='black', ls='--', lw=1.2,
-                 label=f"target {targets['target_freq']:.3f} Hz")
-    ax_b.axvline(details['twin_freq'], color='red', ls='--', lw=1.2,
-                 label=f"twin {details['twin_freq']:.3f} Hz")
+    if targets['target_freq'] is not None:
+        ax_b.axvline(targets['target_freq'], color='black', ls='--', lw=1.2,
+                     label=f"target {targets['target_freq']:.3f} Hz")
+        ax_b.set_title('(B) Dominant network oscillation (highest peak vs target)')
+    else:
+        ax_b.set_title('(B) Spectral profile - no dominant oscillation '
+                       '(1/f-type state, matched by shape/bursts/sync)')
+        ax_b.text(0.98, 0.85, 'no dominant oscillation detected\n'
+                  '(interior-peak criterion)', transform=ax_b.transAxes,
+                  ha='right', fontsize=10, color='dimgray', style='italic')
+    if details['twin_freq'] is not None:
+        ax_b.axvline(details['twin_freq'], color='red', ls='--', lw=1.2,
+                     label=f"twin {details['twin_freq']:.3f} Hz")
     ax_b.set_xlabel('Frequency (Hz)')
     ax_b.set_ylabel('Normalised PSD')
-    ax_b.set_title('(B) Dominant network oscillation (highest peak vs target)')
     ax_b.legend(fontsize=9)
     ax_b.grid(True, alpha=0.3)
 
@@ -1478,7 +1684,8 @@ def process_recording(rec, out_base):
                                f'{subject} - {label} - Twin vs organoid activity',
                                os.path.join(tw_dir, 'twin_activity_traces.png'),
                                skeleton=skel, W_values=Wv)
-            _, twin_amps, _ = simulate_twin(twin_result['params'], len(pop_env), skel, Wv)
+            _, _amps_b, _ = simulate_twin(twin_result['params'], len(pop_env), skel, Wv)
+            twin_amps = _amps_b[0]  # trial 0 (T, K) for the CEBRA comparison
             params_json = {
                 'state': label, 'overall_rmse': twin_result['overall'],
                 'targets': {'rate_hz': twin_result['targets']['target_rate'],
@@ -1501,6 +1708,8 @@ def process_recording(rec, out_base):
                               'target_freq': twin_result['targets']['target_freq'],
                               'pred_rate': twin_result['details']['pred_rate'],
                               'twin_freq': twin_result['details']['twin_freq'],
+                              'sync_r': twin_result['details']['sync_r'],
+                              'wasserstein_hz': twin_result['details']['wasserstein_hz'],
                               'params': {k: float(v)
                                          for k, v in twin_result['params'].items()}}
 
@@ -1544,7 +1753,9 @@ def run_longitudinal(subject, results, out_base):
         pps = [r['ppglm'] for r in rs if r['ppglm'] is not None]
         labels.append(str(key)[:19])
         rate_t.append(np.mean([t['target_rate'] for t in twins]) if twins else np.nan)
-        freq_t.append(np.mean([t['target_freq'] for t in twins]) if twins else np.nan)
+        freqs_ok = [t['target_freq'] for t in twins
+                    if t.get('target_freq') is not None]
+        freq_t.append(np.mean(freqs_ok) if freqs_ok else np.nan)
         rmse_t.append(np.mean([t['overall'] for t in twins]) if twins else np.nan)
         edges_t.append(np.mean([p['n_edges'] for p in pps]) if pps else np.nan)
         coupling_t.append(np.mean([p['mean_abs_coupling'] for p in pps]) if pps else np.nan)
