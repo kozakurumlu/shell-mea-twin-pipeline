@@ -1648,6 +1648,26 @@ def plot_ga_report(twin, title, output_path):
     plt.close(fig)
 
 
+# Computer Modern (LaTeX) styling for the paper figure. cmr10 is the actual
+# LaTeX text font bundled with matplotlib; glyphs it lacks (e.g. underscore)
+# fall back per-glyph to STIX/DejaVu serif. Scoped via rc_context so only the
+# twin activity figure is affected.
+_TWIN_TEX_RC = {
+    'font.family': ['cmr10', 'STIXGeneral', 'DejaVu Serif'],
+    'mathtext.fontset': 'cm',
+    'axes.formatter.use_mathtext': True,
+    'axes.unicode_minus': False,
+}
+
+
+def _with_tex_style(fn):
+    def wrapped(*args, **kwargs):
+        with plt.rc_context(_TWIN_TEX_RC):
+            return fn(*args, **kwargs)
+    return wrapped
+
+
+@_with_tex_style
 def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
                        W_values=None):
     """Paper-style activity traces (arXiv:2605.25224 Figs. 3B-C / 4A-B).
@@ -1689,10 +1709,9 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
               label=f'RRN twin rate (realisation {rep + 1}/{TWIN_N_TRIALS})')
     ax_a.set_xlabel('Time (s)')
     ax_a.set_ylabel('Population firing rate (Hz)')
-    ax_a.set_title('(A) Autonomous twin (no input): one noise realisation vs '
-                   'organoid population rate - organoid '
-                   f"{targets['target_rate']:.3f} Hz, twin "
-                   f"{details['pred_rate']:.3f} Hz")
+    ax_a.set_title(f"(A) Autonomous twin - organoid "
+                   f"{targets['target_rate']:.2f} Hz, twin "
+                   f"{details['pred_rate']:.2f} Hz")
     ax_a.legend(fontsize=8, ncol=2)
     ax_a.grid(True, alpha=0.3)
 
@@ -1725,11 +1744,9 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
     if targets['target_freq'] is not None:
         ax_b.axvline(targets['target_freq'], color='black', ls='--', lw=1.2,
                      label=f"target {targets['target_freq']:.3f} Hz")
-        ax_b.set_title('(B) Spectral profile: organoid PSD vs twin trial range '
-                       '- dominant network oscillation vs target')
+        ax_b.set_title('(B) Spectral profile (dominant oscillation vs target)')
     else:
-        ax_b.set_title('(B) Spectral profile: organoid PSD vs twin trial range '
-                       '- no dominant oscillation (1/f-type state)')
+        ax_b.set_title('(B) Spectral profile (no dominant oscillation)')
         spur = int(round(details.get('twin_peak_frac', 0.0) * TWIN_N_TRIALS))
         ax_b.text(0.98, 0.82, 'no dominant oscillation detected\n'
                   '(prominence vs permutation null, 5% level)\n'
@@ -1765,15 +1782,14 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
               color='darkred', fontweight='bold')
     ax_c.set_xlabel('Time (s)')
     ax_c.set_ylabel('Population firing rate (Hz)')
-    ax_c.set_title("(C) Driven twin: reservoir teacher-forced by the "
-                   "organoid's own population-rate envelope (z-scored, "
-                   "sync_gain applied), ridge readout scored on the held-out "
-                   "segment right of the dashed split", fontsize=11)
+    ax_c.set_title("(C) Driven twin: teacher-forced by the organoid envelope")
     ax_c.legend(fontsize=8, ncol=2, loc='upper left')
     ax_c.grid(True, alpha=0.3)
 
     fig.subplots_adjust(top=0.93, bottom=0.05, left=0.07, right=0.97)
-    plt.suptitle(title, fontsize=14, fontweight='bold')
+    # cmr10 (OT1 encoding) has no underscore glyph - the slot renders as a
+    # dot accent - so sanitise it out of the displayed title only
+    plt.suptitle(title.replace('_', ' '), fontsize=14, fontweight='bold')
     _safe_savefig(fig, output_path)
     plt.close(fig)
 
@@ -1949,9 +1965,7 @@ def process_recording(rec, out_base):
                            f'{subject} - {label} - NSGA-III optimisation',
                            os.path.join(tw_dir, 'ga_pareto_convergence.png'))
             plot_twin_activity(twin_result, pop_env,
-                               f"{subject} - {label} - RRN digital twin vs "
-                               "organoid: autonomous rate, spectrum, and "
-                               "driven synchronisation",
+                               f"{subject} - {label}: RRN twin vs organoid",
                                os.path.join(tw_dir, 'twin_activity_traces.png'),
                                skeleton=skel, W_values=Wv)
             # CEBRA compares the DRIVEN reservoir's amplitudes (the twin

@@ -57,8 +57,7 @@ def main():
     out = os.path.join(tw_dir, 'twin_activity_traces.png')
     pipe.plot_twin_activity(
         twin, pop_env,
-        f"{subject} - {label} - RRN digital twin vs organoid: autonomous "
-        "rate, spectrum, and driven synchronisation",
+        f"{subject} - {label}: RRN twin vs organoid",
         out, skeleton=skeleton, W_values=W_values)
     print(f'Rewrote {out}')
 
