@@ -33,7 +33,11 @@
         "burst_decay": 0.18061069706346017
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.19413214921951294,
+      "r2_twin_to_org": 0.11459358781576157,
+      "procrustes": 0.8051089493931537
+    }
   },
   {
     "subject": "BO14",
@@ -69,7 +73,11 @@
         "burst_decay": 0.31907784973152836
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.16383247077465057,
+      "r2_twin_to_org": 0.13982753455638885,
+      "procrustes": 0.8602044039929302
+    }
   },
   {
     "subject": "BO14",
@@ -105,7 +113,11 @@
         "burst_decay": 0.10398013323376626
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -1.1477298736572266,
+      "r2_twin_to_org": -0.4121614992618561,
+      "procrustes": 0.81548579656607
+    }
   },
   {
     "subject": "BO14",
@@ -141,7 +153,11 @@
         "burst_decay": 0.046598895788498636
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -1.0802615880966187,
+      "r2_twin_to_org": 0.2490934282541275,
+      "procrustes": 0.6926947971374156
+    }
   },
   {
     "subject": "BO14",
@@ -177,7 +193,11 @@
         "burst_decay": 0.6064934307111631
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.3799186646938324,
+      "r2_twin_to_org": 0.10704118013381958,
+      "procrustes": 0.7122803980750018
+    }
   },
   {
     "subject": "BO14",
@@ -213,7 +233,11 @@
         "burst_decay": 0.5616497430534264
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.35756444931030273,
+      "r2_twin_to_org": -0.8975408673286438,
+      "procrustes": 0.6991172153385115
+    }
   },
   {
     "subject": "BO14",
@@ -249,7 +273,11 @@
         "burst_decay": 0.46160256711557834
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.21700768172740936,
+      "r2_twin_to_org": -0.1609693020582199,
+      "procrustes": 0.8323999493196106
+    }
   },
   {
     "subject": "BO2",
@@ -285,7 +313,11 @@
         "burst_decay": 0.11634363691917017
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": 0.11011109501123428,
+      "r2_twin_to_org": 0.21588291227817535,
+      "procrustes": 0.5034805652792971
+    }
   },
   {
     "subject": "BO2",
@@ -321,7 +353,11 @@
         "burst_decay": 0.028163459660624966
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.5288294553756714,
+      "r2_twin_to_org": -1.3087279796600342,
+      "procrustes": 0.7391314616664713
+    }
   },
   {
     "subject": "BO2",
@@ -357,7 +393,11 @@
         "burst_decay": 0.00975306715516638
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -3.5282819271087646,
+      "r2_twin_to_org": -5.277668476104736,
+      "procrustes": 0.6214596717192208
+    }
   },
   {
     "subject": "BO2",
@@ -393,7 +433,11 @@
         "burst_decay": 0.1869939552249563
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -3.5699150562286377,
+      "r2_twin_to_org": -2.5379836559295654,
+      "procrustes": 0.6902192158780315
+    }
   },
   {
     "subject": "BO2",
@@ -429,7 +473,11 @@
         "burst_decay": 0.06436466436103074
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -3.5734970569610596,
+      "r2_twin_to_org": -0.5940857529640198,
+      "procrustes": 0.5970118592121751
+    }
   },
   {
     "subject": "BO2",
@@ -465,7 +513,11 @@
         "burst_decay": 0.1316906645505252
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -5.56121301651001,
+      "r2_twin_to_org": -4.002358913421631,
+      "procrustes": 0.4479313983808621
+    }
   },
   {
     "subject": "BO2",
@@ -501,7 +553,11 @@
         "burst_decay": 0.13648942572462944
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -4.432362079620361,
+      "r2_twin_to_org": 0.16732753813266754,
+      "procrustes": 0.5586941856946718
+    }
   },
   {
     "subject": "SO1",
@@ -533,7 +589,11 @@
         "burst_decay": 0.31187311676986296
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.008991221897304058,
+      "r2_twin_to_org": 0.062179822474718094,
+      "procrustes": 0.8527205516767602
+    }
   },
   {
     "subject": "SO1",
@@ -569,6 +629,10 @@
         "burst_decay": 0.056077074882743556
       }
     },
-    "cebra": null
+    "cebra": {
+      "r2_org_to_twin": -0.5068586468696594,
+      "r2_twin_to_org": 0.1091943010687828,
+      "procrustes": 0.8757586325606909
+    }
   }
 ]

@@ -264,6 +264,7 @@
     0.8380158010658013,
     -0.11094008609206484
   ],
+  "sigma": 0.005,
   "optimiser": {
     "algorithm": "NSGA-III (Sethi, Faraz & Wong-Lin, arXiv:2605.25224)",
     "pop_size": 50,
