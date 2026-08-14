@@ -10,29 +10,30 @@
       "threshold": 0.36787712872028344
     },
     "twin": {
-      "overall": 0.18824370331081114,
+      "overall": 0.1427099277614961,
       "target_rate": 9.441666603088379,
       "target_freq": null,
-      "pred_rate": 9.743473491712866,
+      "pred_rate": 9.70039625397339,
       "twin_freq": null,
-      "sync_r": 0.8174794617549583,
-      "wasserstein_hz": 1.944025566539715,
+      "sync_r": 0.9240093632574308,
+      "wasserstein_hz": 1.9737631875438948,
       "params": {
-        "drive_freq": 0.2736893931749531,
-        "drive_amp": 0.001459686633124769,
-        "base_geometric_ratio": 0.8713843216257894,
-        "spectral_radius": 0.32036168441275836,
-        "output_gain": 7.469469143853662,
-        "sigma": 0.6467206675869652,
-        "sync_gain": 4.710309385438112,
-        "burst_beta": 0.6831984790089982
+        "drive_freq": 0.03154360236817155,
+        "drive_amp": 0.16876922669080457,
+        "base_geometric_ratio": 0.7508425411407443,
+        "spectral_radius": 1.0589786169586963,
+        "sigma": 0.012834219060409383,
+        "sync_gain": 0.027355820629046262,
+        "base_rate": 4.880614532511696,
+        "burst_rate": 0.5020602832627128,
+        "burst_amp": 7.129116467310883,
+        "burst_shape": 1.0809586215891807,
+        "burst_kappa": 0.7698709823985644,
+        "burst_beta": 0.2518607453882224,
+        "burst_decay": 0.18061069706346017
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.20734632015228271,
-      "r2_twin_to_org": -0.16925525665283203,
-      "procrustes": 0.9578810941766898
-    }
+    "cebra": null
   },
   {
     "subject": "BO14",
@@ -45,29 +46,30 @@
       "threshold": 0.3569144621491431
     },
     "twin": {
-      "overall": 0.22698811101483624,
+      "overall": 0.1453242440534136,
       "target_rate": 9.827083587646484,
       "target_freq": null,
-      "pred_rate": 7.959833139380389,
-      "twin_freq": 0.05,
-      "sync_r": 0.871276484120391,
-      "wasserstein_hz": 2.0230869291962232,
+      "pred_rate": 9.937298902985185,
+      "twin_freq": null,
+      "sync_r": 0.8854987530154621,
+      "wasserstein_hz": 1.7497254017866761,
       "params": {
-        "drive_freq": 0.322347590336702,
-        "drive_amp": 0.004831776444261264,
-        "base_geometric_ratio": 0.7848146543830081,
-        "spectral_radius": 0.6052352365554324,
-        "output_gain": 4.632089113217101,
-        "sigma": 0.016057373396944203,
-        "sync_gain": 0.03642578603547556,
-        "burst_beta": 1.0718206203791865
+        "drive_freq": 0.04311463455442657,
+        "drive_amp": 0.028867427756323442,
+        "base_geometric_ratio": 0.7443383475431796,
+        "spectral_radius": 0.9248706989677382,
+        "sigma": 0.07153003278506796,
+        "sync_gain": 0.1486305342797475,
+        "base_rate": 1.1550731095411686,
+        "burst_rate": 0.8874604620030914,
+        "burst_amp": 7.259331307122347,
+        "burst_shape": 1.193718061044612,
+        "burst_kappa": 0.32988317334966677,
+        "burst_beta": 0.172234011499676,
+        "burst_decay": 0.31907784973152836
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.2972712814807892,
-      "r2_twin_to_org": -0.1563243418931961,
-      "procrustes": 0.9370990670807803
-    }
+    "cebra": null
   },
   {
     "subject": "BO14",
@@ -80,29 +82,30 @@
       "threshold": 0.360193872451782
     },
     "twin": {
-      "overall": 0.259693853431691,
+      "overall": 0.21080737534294558,
       "target_rate": 9.637499809265137,
       "target_freq": null,
-      "pred_rate": 8.585958002691251,
-      "twin_freq": 0.058333333333333334,
-      "sync_r": 0.8715145094677085,
-      "wasserstein_hz": 1.9330931049579028,
+      "pred_rate": 8.277741407322813,
+      "twin_freq": null,
+      "sync_r": 0.9506855395574089,
+      "wasserstein_hz": 3.404769131943934,
       "params": {
-        "drive_freq": 0.3585962906645922,
-        "drive_amp": 0.001362384099881794,
-        "base_geometric_ratio": 0.7586867673653104,
-        "spectral_radius": 1.1805803249963296,
-        "output_gain": 4.6403110631320645,
-        "sigma": 0.005399433334061186,
-        "sync_gain": 0.16423311513239708,
-        "burst_beta": 1.2408526906770765
+        "drive_freq": 0.034400879613746875,
+        "drive_amp": 0.04942627509740826,
+        "base_geometric_ratio": 0.7345673988731903,
+        "spectral_radius": 0.8279246606811989,
+        "sigma": 0.0007924714378467633,
+        "sync_gain": 0.042295132098527775,
+        "base_rate": 5.559816271550319,
+        "burst_rate": 0.10854813781102576,
+        "burst_amp": 10.912978024464135,
+        "burst_shape": 0.0160190204741254,
+        "burst_kappa": 0.7519379753445673,
+        "burst_beta": 1.1819858312967901,
+        "burst_decay": 0.10398013323376626
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.536214292049408,
-      "r2_twin_to_org": -0.9753972887992859,
-      "procrustes": 0.9757184364631666
-    }
+    "cebra": null
   },
   {
     "subject": "BO14",
@@ -115,29 +118,30 @@
       "threshold": 0.3568119049072265
     },
     "twin": {
-      "overall": 0.284644714393075,
+      "overall": 0.14454516403683737,
       "target_rate": 9.864583015441895,
       "target_freq": null,
-      "pred_rate": 11.315941948792808,
+      "pred_rate": 10.324907126041435,
       "twin_freq": null,
-      "sync_r": 0.9027793752991556,
-      "wasserstein_hz": 3.7379468734475227,
+      "sync_r": 0.9319145048941491,
+      "wasserstein_hz": 1.7142116836197305,
       "params": {
-        "drive_freq": 0.26341922512588933,
-        "drive_amp": 0.0013008543138687768,
-        "base_geometric_ratio": 0.9662213813678123,
-        "spectral_radius": 0.5258607818573469,
-        "output_gain": 8.445765335640564,
-        "sigma": 0.006757216206329858,
-        "sync_gain": 0.09494878456332825,
-        "burst_beta": 0.7746860529767816
+        "drive_freq": 0.4023240244546106,
+        "drive_amp": 0.002504335756409953,
+        "base_geometric_ratio": 0.7397427809683755,
+        "spectral_radius": 0.8308034305485765,
+        "sigma": 0.01562606606557689,
+        "sync_gain": 0.20537243497583188,
+        "base_rate": 4.263914501177951,
+        "burst_rate": 0.40929587300430453,
+        "burst_amp": 7.306874469148941,
+        "burst_shape": 0.4888156207693131,
+        "burst_kappa": 1.1487714739316863,
+        "burst_beta": 1.6693193494684784,
+        "burst_decay": 0.046598895788498636
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.173052117228508,
-      "r2_twin_to_org": -0.9585496783256531,
-      "procrustes": 0.9782774548996138
-    }
+    "cebra": null
   },
   {
     "subject": "BO14",
@@ -150,29 +154,30 @@
       "threshold": 0.40839612185955043
     },
     "twin": {
-      "overall": 0.26817092389126523,
+      "overall": 0.2193899742332317,
       "target_rate": 9.176714897155762,
       "target_freq": null,
-      "pred_rate": 8.964651569640157,
-      "twin_freq": 0.16666666666666666,
-      "sync_r": 0.8299370992200347,
-      "wasserstein_hz": 3.039627260611385,
+      "pred_rate": 9.259018967051315,
+      "twin_freq": null,
+      "sync_r": 0.8966869338692177,
+      "wasserstein_hz": 2.36491692602809,
       "params": {
-        "drive_freq": 0.10959077112789026,
-        "drive_amp": 0.001381894748590496,
-        "base_geometric_ratio": 0.8419394341548283,
-        "spectral_radius": 0.2897693364734355,
-        "output_gain": 7.0559774420032255,
-        "sigma": 0.0076241915580873175,
-        "sync_gain": 0.04412595044219685,
-        "burst_beta": 0.6899403906568345
+        "drive_freq": 0.12990844612880215,
+        "drive_amp": 0.002367824444459367,
+        "base_geometric_ratio": 0.7146273729197266,
+        "spectral_radius": 0.6569641637023401,
+        "sigma": 0.00048605428774351286,
+        "sync_gain": 0.05787357878550217,
+        "base_rate": 4.467193545097698,
+        "burst_rate": 0.09690175316568875,
+        "burst_amp": 11.560932815995733,
+        "burst_shape": 1.030045018020681,
+        "burst_kappa": 0.9314583523884433,
+        "burst_beta": 0.9110610178246772,
+        "burst_decay": 0.6064934307111631
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.07244672626256943,
-      "r2_twin_to_org": -0.2742851674556732,
-      "procrustes": 0.9319505232929545
-    }
+    "cebra": null
   },
   {
     "subject": "BO14",
@@ -185,29 +190,30 @@
       "threshold": 0.36618383973836893
     },
     "twin": {
-      "overall": 0.26024765455443544,
+      "overall": 0.15122217780346126,
       "target_rate": 9.710416793823242,
       "target_freq": null,
-      "pred_rate": 11.542877522929418,
-      "twin_freq": 0.10416666666666666,
-      "sync_r": 0.8623849220357857,
-      "wasserstein_hz": 2.448262849507871,
+      "pred_rate": 8.850620728529911,
+      "twin_freq": null,
+      "sync_r": 0.813040205523501,
+      "wasserstein_hz": 1.3202762317491137,
       "params": {
-        "drive_freq": 0.16678985764523907,
-        "drive_amp": 0.00745174688581294,
-        "base_geometric_ratio": 0.8298369124207934,
-        "spectral_radius": 1.1894831469843816,
-        "output_gain": 6.819722465330646,
-        "sigma": 0.019297290564034453,
-        "sync_gain": 0.02083914797998696,
-        "burst_beta": 1.2124902545242968
+        "drive_freq": 0.34121537947325264,
+        "drive_amp": 0.01506267799159447,
+        "base_geometric_ratio": 0.904036946807359,
+        "spectral_radius": 1.1494941915623258,
+        "sigma": 0.0004966812196460035,
+        "sync_gain": 0.24675435124369785,
+        "base_rate": 0.0033083808568841995,
+        "burst_rate": 0.4071306285350408,
+        "burst_amp": 6.943250270141206,
+        "burst_shape": 1.0592281621735036,
+        "burst_kappa": 1.1646859219090362,
+        "burst_beta": 0.5388600023898344,
+        "burst_decay": 0.5616497430534264
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.33043691515922546,
-      "r2_twin_to_org": -2.824699640274048,
-      "procrustes": 0.9558609689945278
-    }
+    "cebra": null
   },
   {
     "subject": "BO14",
@@ -220,29 +226,30 @@
       "threshold": 0.35770677924156175
     },
     "twin": {
-      "overall": 0.2501973396569725,
+      "overall": 0.1779617541484937,
       "target_rate": 8.185416221618652,
       "target_freq": null,
-      "pred_rate": 6.320617319692693,
-      "twin_freq": 0.125,
-      "sync_r": 0.8678690591447293,
-      "wasserstein_hz": 2.395739401308347,
+      "pred_rate": 8.083334570917605,
+      "twin_freq": null,
+      "sync_r": 0.9192304009547195,
+      "wasserstein_hz": 2.3380596165855154,
       "params": {
-        "drive_freq": 0.18066455620714222,
-        "drive_amp": 0.0016910889450273312,
-        "base_geometric_ratio": 0.8816080502879332,
-        "spectral_radius": 0.3399391859087986,
-        "output_gain": 2.9038727390235004,
-        "sigma": 0.7836185752244822,
-        "sync_gain": 0.6765293996503277,
-        "burst_beta": 1.1286227637378659
+        "drive_freq": 0.1716708528045276,
+        "drive_amp": 0.011096603222165886,
+        "base_geometric_ratio": 0.7029326730900076,
+        "spectral_radius": 1.0890353114768698,
+        "sigma": 0.10561780784633353,
+        "sync_gain": 0.12226102157839541,
+        "base_rate": 2.7921242806122923,
+        "burst_rate": 0.18528393200504686,
+        "burst_amp": 12.142420047718952,
+        "burst_shape": 1.4410383227232149,
+        "burst_kappa": 0.44379060177726193,
+        "burst_beta": 0.4914144401264187,
+        "burst_decay": 0.46160256711557834
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.10526049137115479,
-      "r2_twin_to_org": -0.9015242457389832,
-      "procrustes": 0.9820069595263123
-    }
+    "cebra": null
   },
   {
     "subject": "BO2",
@@ -254,7 +261,30 @@
       "mean_abs_coupling": 5.246078915066189,
       "threshold": 1.4302190244197845
     },
-    "twin": null,
+    "twin": {
+      "overall": 0.28091924575970273,
+      "target_rate": 7.930232524871826,
+      "target_freq": null,
+      "pred_rate": 7.679339547684671,
+      "twin_freq": null,
+      "sync_r": 0.9742898843489395,
+      "wasserstein_hz": 4.545024432842691,
+      "params": {
+        "drive_freq": 0.40991522040337114,
+        "drive_amp": 0.0018529531745540319,
+        "base_geometric_ratio": 0.7741779615169504,
+        "spectral_radius": 1.087605194724102,
+        "sigma": 0.0006434050603317924,
+        "sync_gain": 0.14983361978023,
+        "base_rate": 0.0058672376841288195,
+        "burst_rate": 0.8631244814323565,
+        "burst_amp": 6.835431099977807,
+        "burst_shape": 1.3506308870895183,
+        "burst_kappa": 0.7670585088950901,
+        "burst_beta": 2.8615336507434423,
+        "burst_decay": 0.11634363691917017
+      }
+    },
     "cebra": null
   },
   {
@@ -267,7 +297,30 @@
       "mean_abs_coupling": 5.208638985951741,
       "threshold": 1.1836459934711456
     },
-    "twin": null,
+    "twin": {
+      "overall": 0.37153979759978956,
+      "target_rate": 7.1868133544921875,
+      "target_freq": null,
+      "pred_rate": 7.194894765563711,
+      "twin_freq": null,
+      "sync_r": 0.6116581712319743,
+      "wasserstein_hz": 4.911236614013581,
+      "params": {
+        "drive_freq": 0.1545459845988622,
+        "drive_amp": 0.5121854416364904,
+        "base_geometric_ratio": 0.7164659671119309,
+        "spectral_radius": 0.482973923991451,
+        "sigma": 0.000979306269366242,
+        "sync_gain": 0.12981781366445583,
+        "base_rate": 0.00241196109593741,
+        "burst_rate": 0.13944365605084036,
+        "burst_amp": 11.680411482965901,
+        "burst_shape": 1.4929112181026576,
+        "burst_kappa": 2.556530266707626,
+        "burst_beta": 1.914703833891898,
+        "burst_decay": 0.028163459660624966
+      }
+    },
     "cebra": null
   },
   {
@@ -280,7 +333,30 @@
       "mean_abs_coupling": 5.359955337312487,
       "threshold": 1.0991372615098953
     },
-    "twin": null,
+    "twin": {
+      "overall": 0.2801956856783685,
+      "target_rate": 6.2682929039001465,
+      "target_freq": null,
+      "pred_rate": 6.757965457190601,
+      "twin_freq": null,
+      "sync_r": 0.895500772728125,
+      "wasserstein_hz": 3.437707164373677,
+      "params": {
+        "drive_freq": 0.38339195410576654,
+        "drive_amp": 3.293074390942897,
+        "base_geometric_ratio": 0.735443397521999,
+        "spectral_radius": 1.0672953542385468,
+        "sigma": 0.8796263702943481,
+        "sync_gain": 3.113738279045249,
+        "base_rate": 2.0530540362560474,
+        "burst_rate": 0.06939973647921494,
+        "burst_amp": 7.133052170534037,
+        "burst_shape": 0.8700055587855802,
+        "burst_kappa": 3.6446471790229875,
+        "burst_beta": 2.490281649723619,
+        "burst_decay": 0.00975306715516638
+      }
+    },
     "cebra": null
   },
   {
@@ -293,7 +369,30 @@
       "mean_abs_coupling": 4.257218619187673,
       "threshold": 0.5826119184494019
     },
-    "twin": null,
+    "twin": {
+      "overall": 0.24500068307154496,
+      "target_rate": 6.474999904632568,
+      "target_freq": null,
+      "pred_rate": 5.614703084264527,
+      "twin_freq": null,
+      "sync_r": 0.9080850259880816,
+      "wasserstein_hz": 2.860284097471373,
+      "params": {
+        "drive_freq": 0.4272965285051043,
+        "drive_amp": 1.0924703250493124,
+        "base_geometric_ratio": 0.7266541489705873,
+        "spectral_radius": 0.9974128787881954,
+        "sigma": 0.17172942858177598,
+        "sync_gain": 0.7859013952684992,
+        "base_rate": 2.1008807656265054,
+        "burst_rate": 0.1341422585646256,
+        "burst_amp": 10.780372245693666,
+        "burst_shape": 1.289375487823345,
+        "burst_kappa": 0.7548108778290981,
+        "burst_beta": 0.8300178361417523,
+        "burst_decay": 0.1869939552249563
+      }
+    },
     "cebra": null
   },
   {
@@ -306,7 +405,30 @@
       "mean_abs_coupling": 3.2350389692518444,
       "threshold": 0.8360330313444138
     },
-    "twin": null,
+    "twin": {
+      "overall": 0.2559803549890072,
+      "target_rate": 3.5374999046325684,
+      "target_freq": null,
+      "pred_rate": 3.489390461143763,
+      "twin_freq": null,
+      "sync_r": 0.9478195988010286,
+      "wasserstein_hz": 1.7687403969699056,
+      "params": {
+        "drive_freq": 0.29338820985930153,
+        "drive_amp": 2.2861719668162426,
+        "base_geometric_ratio": 0.722794475366827,
+        "spectral_radius": 1.1474639953587795,
+        "sigma": 0.15827633621325476,
+        "sync_gain": 9.376100496439319,
+        "base_rate": 0.005416265193039867,
+        "burst_rate": 0.07229844113282194,
+        "burst_amp": 7.095092831089361,
+        "burst_shape": 0.6430553083473358,
+        "burst_kappa": 3.958376652224119,
+        "burst_beta": 2.886698240134592,
+        "burst_decay": 0.06436466436103074
+      }
+    },
     "cebra": null
   },
   {
@@ -319,7 +441,30 @@
       "mean_abs_coupling": 5.570130560133192,
       "threshold": 1.1877053529024124
     },
-    "twin": null,
+    "twin": {
+      "overall": 0.19651223817779048,
+      "target_rate": 6.953488349914551,
+      "target_freq": null,
+      "pred_rate": 7.762236753396771,
+      "twin_freq": null,
+      "sync_r": 0.9261299478619012,
+      "wasserstein_hz": 2.2093272802073214,
+      "params": {
+        "drive_freq": 0.12971982787074368,
+        "drive_amp": 1.83032867022813,
+        "base_geometric_ratio": 0.7148116265876093,
+        "spectral_radius": 1.0030923065950963,
+        "sigma": 0.0011065134257351942,
+        "sync_gain": 0.08642224243129593,
+        "base_rate": 2.100260580074446,
+        "burst_rate": 0.0870053905383695,
+        "burst_amp": 30.93447381345556,
+        "burst_shape": 0.36451301989924734,
+        "burst_kappa": 2.44449098390909,
+        "burst_beta": 0.5279281173488163,
+        "burst_decay": 0.1316906645505252
+      }
+    },
     "cebra": null
   },
   {
@@ -332,7 +477,30 @@
       "mean_abs_coupling": 4.948179602622986,
       "threshold": 0.5394269153475761
     },
-    "twin": null,
+    "twin": {
+      "overall": 0.21754402741642453,
+      "target_rate": 3.2435896396636963,
+      "target_freq": null,
+      "pred_rate": 3.2118791887364355,
+      "twin_freq": null,
+      "sync_r": 0.9529137569706675,
+      "wasserstein_hz": 1.281606564388001,
+      "params": {
+        "drive_freq": 0.4498737627194569,
+        "drive_amp": 4.019647515551633,
+        "base_geometric_ratio": 0.7399738940162374,
+        "spectral_radius": 1.0838094350091823,
+        "sigma": 0.0004042467062327389,
+        "sync_gain": 0.0803563783442144,
+        "base_rate": 0.01588799861132352,
+        "burst_rate": 0.07274529109665404,
+        "burst_amp": 7.435587847837132,
+        "burst_shape": 0.19570974073917405,
+        "burst_kappa": 2.3360789988508337,
+        "burst_beta": 2.195949224796906,
+        "burst_decay": 0.13648942572462944
+      }
+    },
     "cebra": null
   },
   {
@@ -342,29 +510,30 @@
     "session_start": "2023-07-21 11:11:44-04:00",
     "ppglm": null,
     "twin": {
-      "overall": 0.2836109367191717,
+      "overall": 0.2559765538892955,
       "target_rate": 0.2450331151485443,
       "target_freq": null,
-      "pred_rate": 0.23433735480402398,
+      "pred_rate": 0.22111635786275619,
       "twin_freq": null,
-      "sync_r": 0.8449161825436126,
-      "wasserstein_hz": 0.1297039756042329,
+      "sync_r": 0.8675097959982278,
+      "wasserstein_hz": 0.11242914487711224,
       "params": {
-        "drive_freq": 0.44733222691294033,
-        "drive_amp": 0.13042426473361104,
-        "base_geometric_ratio": 0.7134981780230811,
-        "spectral_radius": 0.4188304935794694,
-        "output_gain": 0.014683614016999316,
-        "sigma": 0.020420971880759045,
-        "sync_gain": 0.05371506492624669,
-        "burst_beta": 2.475633430152674
+        "drive_freq": 0.32240657670267,
+        "drive_amp": 0.1852702835620951,
+        "base_geometric_ratio": 0.7076810838756665,
+        "spectral_radius": 1.1084210311274918,
+        "sigma": 0.0004245489679333254,
+        "sync_gain": 0.024860270672542907,
+        "base_rate": 0.006875588128983956,
+        "burst_rate": 0.415684148766825,
+        "burst_amp": 0.1961555842550078,
+        "burst_shape": 0.7020559158932169,
+        "burst_kappa": 3.9250622000689592,
+        "burst_beta": 2.494537147909809,
+        "burst_decay": 0.31187311676986296
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.13829033076763153,
-      "r2_twin_to_org": -0.04335169121623039,
-      "procrustes": 0.9547858127405495
-    }
+    "cebra": null
   },
   {
     "subject": "SO1",
@@ -377,28 +546,29 @@
       "threshold": 1.1988358423113823
     },
     "twin": {
-      "overall": 0.317147358710774,
+      "overall": 0.2665669089283131,
       "target_rate": 2.91961407661438,
-      "target_freq": 0.18181818181818182,
-      "pred_rate": 2.4769223232185267,
-      "twin_freq": 0.19480519480519481,
-      "sync_r": 0.879036565440604,
-      "wasserstein_hz": 1.7816810422068508,
+      "target_freq": null,
+      "pred_rate": 2.7432992261352562,
+      "twin_freq": null,
+      "sync_r": 0.9362247562712711,
+      "wasserstein_hz": 1.5656504469892982,
       "params": {
-        "drive_freq": 0.19412072061017882,
-        "drive_amp": 0.0026375420464611883,
-        "base_geometric_ratio": 0.8236862781292338,
-        "spectral_radius": 1.1106458310550829,
-        "output_gain": 0.12851009796001084,
-        "sigma": 0.0007055539682362206,
-        "sync_gain": 0.049978074317188356,
-        "burst_beta": 2.786982657688829
+        "drive_freq": 0.26247745911117487,
+        "drive_amp": 0.06631448015469912,
+        "base_geometric_ratio": 0.776060008870848,
+        "spectral_radius": 1.1484712119995757,
+        "sigma": 0.0006903038784517523,
+        "sync_gain": 0.24140343645735338,
+        "base_rate": 1.1204586498814317,
+        "burst_rate": 0.7774043992512178,
+        "burst_amp": 1.6029118391630524,
+        "burst_shape": 1.0324668484047812,
+        "burst_kappa": 0.2457409478830414,
+        "burst_beta": 1.466485561518969,
+        "burst_decay": 0.056077074882743556
       }
     },
-    "cebra": {
-      "r2_org_to_twin": -0.26432064175605774,
-      "r2_twin_to_org": -0.2269556075334549,
-      "procrustes": 0.9715098309586117
-    }
+    "cebra": null
   }
 ]

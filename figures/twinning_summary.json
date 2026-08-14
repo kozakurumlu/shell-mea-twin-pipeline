@@ -1,0 +1,482 @@
+[
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "10uA",
+    "session_start": "2024-06-25 19:26:19-04:00",
+    "twin": {
+      "overall": 0.1427099277614961,
+      "target_rate": 9.441666603088379,
+      "target_freq": null,
+      "pred_rate": 9.70039625397339,
+      "twin_freq": null,
+      "sync_r": 0.9240093632574308,
+      "wasserstein_hz": 1.9737631875438948,
+      "params": {
+        "drive_freq": 0.03154360236817155,
+        "drive_amp": 0.16876922669080457,
+        "base_geometric_ratio": 0.7508425411407443,
+        "spectral_radius": 1.0589786169586963,
+        "sigma": 0.012834219060409383,
+        "sync_gain": 0.027355820629046262,
+        "base_rate": 4.880614532511696,
+        "burst_rate": 0.5020602832627128,
+        "burst_amp": 7.129116467310883,
+        "burst_shape": 1.0809586215891807,
+        "burst_kappa": 0.7698709823985644,
+        "burst_beta": 0.2518607453882224,
+        "burst_decay": 0.18061069706346017
+      }
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "20uA",
+    "session_start": "2024-06-25 19:36:03-04:00",
+    "twin": {
+      "overall": 0.1453242440534136,
+      "target_rate": 9.827083587646484,
+      "target_freq": null,
+      "pred_rate": 9.937298902985185,
+      "twin_freq": null,
+      "sync_r": 0.8854987530154621,
+      "wasserstein_hz": 1.7497254017866761,
+      "params": {
+        "drive_freq": 0.04311463455442657,
+        "drive_amp": 0.028867427756323442,
+        "base_geometric_ratio": 0.7443383475431796,
+        "spectral_radius": 0.9248706989677382,
+        "sigma": 0.07153003278506796,
+        "sync_gain": 0.1486305342797475,
+        "base_rate": 1.1550731095411686,
+        "burst_rate": 0.8874604620030914,
+        "burst_amp": 7.259331307122347,
+        "burst_shape": 1.193718061044612,
+        "burst_kappa": 0.32988317334966677,
+        "burst_beta": 0.172234011499676,
+        "burst_decay": 0.31907784973152836
+      }
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "30uA",
+    "session_start": "2024-06-25 19:45:36-04:00",
+    "twin": {
+      "overall": 0.21080737534294558,
+      "target_rate": 9.637499809265137,
+      "target_freq": null,
+      "pred_rate": 8.277741407322813,
+      "twin_freq": null,
+      "sync_r": 0.9506855395574089,
+      "wasserstein_hz": 3.404769131943934,
+      "params": {
+        "drive_freq": 0.034400879613746875,
+        "drive_amp": 0.04942627509740826,
+        "base_geometric_ratio": 0.7345673988731903,
+        "spectral_radius": 0.8279246606811989,
+        "sigma": 0.0007924714378467633,
+        "sync_gain": 0.042295132098527775,
+        "base_rate": 5.559816271550319,
+        "burst_rate": 0.10854813781102576,
+        "burst_amp": 10.912978024464135,
+        "burst_shape": 0.0160190204741254,
+        "burst_kappa": 0.7519379753445673,
+        "burst_beta": 1.1819858312967901,
+        "burst_decay": 0.10398013323376626
+      }
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "40uA",
+    "session_start": "2024-06-25 19:55:12-04:00",
+    "twin": {
+      "overall": 0.14454516403683737,
+      "target_rate": 9.864583015441895,
+      "target_freq": null,
+      "pred_rate": 10.324907126041435,
+      "twin_freq": null,
+      "sync_r": 0.9319145048941491,
+      "wasserstein_hz": 1.7142116836197305,
+      "params": {
+        "drive_freq": 0.4023240244546106,
+        "drive_amp": 0.002504335756409953,
+        "base_geometric_ratio": 0.7397427809683755,
+        "spectral_radius": 0.8308034305485765,
+        "sigma": 0.01562606606557689,
+        "sync_gain": 0.20537243497583188,
+        "base_rate": 4.263914501177951,
+        "burst_rate": 0.40929587300430453,
+        "burst_amp": 7.306874469148941,
+        "burst_shape": 0.4888156207693131,
+        "burst_kappa": 1.1487714739316863,
+        "burst_beta": 1.6693193494684784,
+        "burst_decay": 0.046598895788498636
+      }
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "50uA",
+    "session_start": "2024-06-25 20:04:33-04:00",
+    "twin": {
+      "overall": 0.2193899742332317,
+      "target_rate": 9.176714897155762,
+      "target_freq": null,
+      "pred_rate": 9.259018967051315,
+      "twin_freq": null,
+      "sync_r": 0.8966869338692177,
+      "wasserstein_hz": 2.36491692602809,
+      "params": {
+        "drive_freq": 0.12990844612880215,
+        "drive_amp": 0.002367824444459367,
+        "base_geometric_ratio": 0.7146273729197266,
+        "spectral_radius": 0.6569641637023401,
+        "sigma": 0.00048605428774351286,
+        "sync_gain": 0.05787357878550217,
+        "base_rate": 4.467193545097698,
+        "burst_rate": 0.09690175316568875,
+        "burst_amp": 11.560932815995733,
+        "burst_shape": 1.030045018020681,
+        "burst_kappa": 0.9314583523884433,
+        "burst_beta": 0.9110610178246772,
+        "burst_decay": 0.6064934307111631
+      }
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "5uA",
+    "session_start": "2024-06-25 19:11:47-04:00",
+    "twin": {
+      "overall": 0.15122217780346126,
+      "target_rate": 9.710416793823242,
+      "target_freq": null,
+      "pred_rate": 8.850620728529911,
+      "twin_freq": null,
+      "sync_r": 0.813040205523501,
+      "wasserstein_hz": 1.3202762317491137,
+      "params": {
+        "drive_freq": 0.34121537947325264,
+        "drive_amp": 0.01506267799159447,
+        "base_geometric_ratio": 0.904036946807359,
+        "spectral_radius": 1.1494941915623258,
+        "sigma": 0.0004966812196460035,
+        "sync_gain": 0.24675435124369785,
+        "base_rate": 0.0033083808568841995,
+        "burst_rate": 0.4071306285350408,
+        "burst_amp": 6.943250270141206,
+        "burst_shape": 1.0592281621735036,
+        "burst_kappa": 1.1646859219090362,
+        "burst_beta": 0.5388600023898344,
+        "burst_decay": 0.5616497430534264
+      }
+    }
+  },
+  {
+    "subject": "BO14",
+    "session": "BO14",
+    "state": "60uA",
+    "session_start": "2024-06-25 20:13:59-04:00",
+    "twin": {
+      "overall": 0.1779617541484937,
+      "target_rate": 8.185416221618652,
+      "target_freq": null,
+      "pred_rate": 8.083334570917605,
+      "twin_freq": null,
+      "sync_r": 0.9192304009547195,
+      "wasserstein_hz": 2.3380596165855154,
+      "params": {
+        "drive_freq": 0.1716708528045276,
+        "drive_amp": 0.011096603222165886,
+        "base_geometric_ratio": 0.7029326730900076,
+        "spectral_radius": 1.0890353114768698,
+        "sigma": 0.10561780784633353,
+        "sync_gain": 0.12226102157839541,
+        "base_rate": 2.7921242806122923,
+        "burst_rate": 0.18528393200504686,
+        "burst_amp": 12.142420047718952,
+        "burst_shape": 1.4410383227232149,
+        "burst_kappa": 0.44379060177726193,
+        "burst_beta": 0.4914144401264187,
+        "burst_decay": 0.46160256711557834
+      }
+    }
+  },
+  {
+    "subject": "BO2",
+    "session": "BO2",
+    "state": "10uA",
+    "session_start": "2023-11-17 10:16:44-05:00",
+    "twin": {
+      "overall": 0.28091924575970273,
+      "target_rate": 7.930232524871826,
+      "target_freq": null,
+      "pred_rate": 7.679339547684671,
+      "twin_freq": null,
+      "sync_r": 0.9742898843489395,
+      "wasserstein_hz": 4.545024432842691,
+      "params": {
+        "drive_freq": 0.40991522040337114,
+        "drive_amp": 0.0018529531745540319,
+        "base_geometric_ratio": 0.7741779615169504,
+        "spectral_radius": 1.087605194724102,
+        "sigma": 0.0006434050603317924,
+        "sync_gain": 0.14983361978023,
+        "base_rate": 0.0058672376841288195,
+        "burst_rate": 0.8631244814323565,
+        "burst_amp": 6.835431099977807,
+        "burst_shape": 1.3506308870895183,
+        "burst_kappa": 0.7670585088950901,
+        "burst_beta": 2.8615336507434423,
+        "burst_decay": 0.11634363691917017
+      }
+    }
+  },
+  {
+    "subject": "BO2",
+    "session": "BO2",
+    "state": "20uA",
+    "session_start": "2023-11-17 10:18:49-05:00",
+    "twin": {
+      "overall": 0.37153979759978956,
+      "target_rate": 7.1868133544921875,
+      "target_freq": null,
+      "pred_rate": 7.194894765563711,
+      "twin_freq": null,
+      "sync_r": 0.6116581712319743,
+      "wasserstein_hz": 4.911236614013581,
+      "params": {
+        "drive_freq": 0.1545459845988622,
+        "drive_amp": 0.5121854416364904,
+        "base_geometric_ratio": 0.7164659671119309,
+        "spectral_radius": 0.482973923991451,
+        "sigma": 0.000979306269366242,
+        "sync_gain": 0.12981781366445583,
+        "base_rate": 0.00241196109593741,
+        "burst_rate": 0.13944365605084036,
+        "burst_amp": 11.680411482965901,
+        "burst_shape": 1.4929112181026576,
+        "burst_kappa": 2.556530266707626,
+        "burst_beta": 1.914703833891898,
+        "burst_decay": 0.028163459660624966
+      }
+    }
+  },
+  {
+    "subject": "BO2",
+    "session": "BO2",
+    "state": "30uA",
+    "session_start": "2023-11-17 10:21:35-05:00",
+    "twin": {
+      "overall": 0.2801956856783685,
+      "target_rate": 6.2682929039001465,
+      "target_freq": null,
+      "pred_rate": 6.757965457190601,
+      "twin_freq": null,
+      "sync_r": 0.895500772728125,
+      "wasserstein_hz": 3.437707164373677,
+      "params": {
+        "drive_freq": 0.38339195410576654,
+        "drive_amp": 3.293074390942897,
+        "base_geometric_ratio": 0.735443397521999,
+        "spectral_radius": 1.0672953542385468,
+        "sigma": 0.8796263702943481,
+        "sync_gain": 3.113738279045249,
+        "base_rate": 2.0530540362560474,
+        "burst_rate": 0.06939973647921494,
+        "burst_amp": 7.133052170534037,
+        "burst_shape": 0.8700055587855802,
+        "burst_kappa": 3.6446471790229875,
+        "burst_beta": 2.490281649723619,
+        "burst_decay": 0.00975306715516638
+      }
+    }
+  },
+  {
+    "subject": "BO2",
+    "session": "BO2",
+    "state": "40uA",
+    "session_start": "2023-11-17 10:24:28-05:00",
+    "twin": {
+      "overall": 0.24500068307154496,
+      "target_rate": 6.474999904632568,
+      "target_freq": null,
+      "pred_rate": 5.614703084264527,
+      "twin_freq": null,
+      "sync_r": 0.9080850259880816,
+      "wasserstein_hz": 2.860284097471373,
+      "params": {
+        "drive_freq": 0.4272965285051043,
+        "drive_amp": 1.0924703250493124,
+        "base_geometric_ratio": 0.7266541489705873,
+        "spectral_radius": 0.9974128787881954,
+        "sigma": 0.17172942858177598,
+        "sync_gain": 0.7859013952684992,
+        "base_rate": 2.1008807656265054,
+        "burst_rate": 0.1341422585646256,
+        "burst_amp": 10.780372245693666,
+        "burst_shape": 1.289375487823345,
+        "burst_kappa": 0.7548108778290981,
+        "burst_beta": 0.8300178361417523,
+        "burst_decay": 0.1869939552249563
+      }
+    }
+  },
+  {
+    "subject": "BO2",
+    "session": "BO2",
+    "state": "50uA",
+    "session_start": "2023-11-17 10:26:40-05:00",
+    "twin": {
+      "overall": 0.2559803549890072,
+      "target_rate": 3.5374999046325684,
+      "target_freq": null,
+      "pred_rate": 3.489390461143763,
+      "twin_freq": null,
+      "sync_r": 0.9478195988010286,
+      "wasserstein_hz": 1.7687403969699056,
+      "params": {
+        "drive_freq": 0.29338820985930153,
+        "drive_amp": 2.2861719668162426,
+        "base_geometric_ratio": 0.722794475366827,
+        "spectral_radius": 1.1474639953587795,
+        "sigma": 0.15827633621325476,
+        "sync_gain": 9.376100496439319,
+        "base_rate": 0.005416265193039867,
+        "burst_rate": 0.07229844113282194,
+        "burst_amp": 7.095092831089361,
+        "burst_shape": 0.6430553083473358,
+        "burst_kappa": 3.958376652224119,
+        "burst_beta": 2.886698240134592,
+        "burst_decay": 0.06436466436103074
+      }
+    }
+  },
+  {
+    "subject": "BO2",
+    "session": "BO2",
+    "state": "5uA",
+    "session_start": "2023-11-17 10:13:33-05:00",
+    "twin": {
+      "overall": 0.19651223817779048,
+      "target_rate": 6.953488349914551,
+      "target_freq": null,
+      "pred_rate": 7.762236753396771,
+      "twin_freq": null,
+      "sync_r": 0.9261299478619012,
+      "wasserstein_hz": 2.2093272802073214,
+      "params": {
+        "drive_freq": 0.12971982787074368,
+        "drive_amp": 1.83032867022813,
+        "base_geometric_ratio": 0.7148116265876093,
+        "spectral_radius": 1.0030923065950963,
+        "sigma": 0.0011065134257351942,
+        "sync_gain": 0.08642224243129593,
+        "base_rate": 2.100260580074446,
+        "burst_rate": 0.0870053905383695,
+        "burst_amp": 30.93447381345556,
+        "burst_shape": 0.36451301989924734,
+        "burst_kappa": 2.44449098390909,
+        "burst_beta": 0.5279281173488163,
+        "burst_decay": 0.1316906645505252
+      }
+    }
+  },
+  {
+    "subject": "BO2",
+    "session": "BO2",
+    "state": "60uA",
+    "session_start": "2023-11-17 10:28:28-05:00",
+    "twin": {
+      "overall": 0.21754402741642453,
+      "target_rate": 3.2435896396636963,
+      "target_freq": null,
+      "pred_rate": 3.2118791887364355,
+      "twin_freq": null,
+      "sync_r": 0.9529137569706675,
+      "wasserstein_hz": 1.281606564388001,
+      "params": {
+        "drive_freq": 0.4498737627194569,
+        "drive_amp": 4.019647515551633,
+        "base_geometric_ratio": 0.7399738940162374,
+        "spectral_radius": 1.0838094350091823,
+        "sigma": 0.0004042467062327389,
+        "sync_gain": 0.0803563783442144,
+        "base_rate": 0.01588799861132352,
+        "burst_rate": 0.07274529109665404,
+        "burst_amp": 7.435587847837132,
+        "burst_shape": 0.19570974073917405,
+        "burst_kappa": 2.3360789988508337,
+        "burst_beta": 2.195949224796906,
+        "burst_decay": 0.13648942572462944
+      }
+    }
+  },
+  {
+    "subject": "SO1",
+    "session": "20230721T111144",
+    "state": "spontaneous",
+    "session_start": "2023-07-21 11:11:44-04:00",
+    "twin": {
+      "overall": 0.2559765538892955,
+      "target_rate": 0.2450331151485443,
+      "target_freq": null,
+      "pred_rate": 0.22111635786275619,
+      "twin_freq": null,
+      "sync_r": 0.8675097959982278,
+      "wasserstein_hz": 0.11242914487711224,
+      "params": {
+        "drive_freq": 0.32240657670267,
+        "drive_amp": 0.1852702835620951,
+        "base_geometric_ratio": 0.7076810838756665,
+        "spectral_radius": 1.1084210311274918,
+        "sigma": 0.0004245489679333254,
+        "sync_gain": 0.024860270672542907,
+        "base_rate": 0.006875588128983956,
+        "burst_rate": 0.415684148766825,
+        "burst_amp": 0.1961555842550078,
+        "burst_shape": 0.7020559158932169,
+        "burst_kappa": 3.9250622000689592,
+        "burst_beta": 2.494537147909809,
+        "burst_decay": 0.31187311676986296
+      }
+    }
+  },
+  {
+    "subject": "SO1",
+    "session": "SO1",
+    "state": "spontaneous",
+    "session_start": "2023-06-13 15:16:01-04:00",
+    "twin": {
+      "overall": 0.2665669089283131,
+      "target_rate": 2.91961407661438,
+      "target_freq": null,
+      "pred_rate": 2.7432992261352562,
+      "twin_freq": null,
+      "sync_r": 0.9362247562712711,
+      "wasserstein_hz": 1.5656504469892982,
+      "params": {
+        "drive_freq": 0.26247745911117487,
+        "drive_amp": 0.06631448015469912,
+        "base_geometric_ratio": 0.776060008870848,
+        "spectral_radius": 1.1484712119995757,
+        "sigma": 0.0006903038784517523,
+        "sync_gain": 0.24140343645735338,
+        "base_rate": 1.1204586498814317,
+        "burst_rate": 0.7774043992512178,
+        "burst_amp": 1.6029118391630524,
+        "burst_shape": 1.0324668484047812,
+        "burst_kappa": 0.2457409478830414,
+        "burst_beta": 1.466485561518969,
+        "burst_decay": 0.056077074882743556
+      }
+    }
+  }
+]
