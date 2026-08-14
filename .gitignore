@@ -10,3 +10,12 @@ __pycache__/
 .DS_Store
 pipeline_run.log
 twinning_run.log
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.bcf
+paper/*.blg
+paper/*.run.xml
+paper/*.synctex.gz
+paper/local_tex.sh
