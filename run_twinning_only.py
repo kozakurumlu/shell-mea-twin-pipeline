@@ -109,7 +109,9 @@ def main():
                     os.path.join(tw_dir, 'ga_pareto_convergence.png'))
                 pipe.plot_twin_activity(
                     tw, pop_env,
-                    f"{rec['subject']} - {label} - Twin vs organoid activity",
+                    f"{rec['subject']} - {label} - RRN digital twin vs "
+                    "organoid: autonomous rate, spectrum, and driven "
+                    "synchronisation",
                     os.path.join(tw_dir, 'twin_activity_traces.png'),
                     skeleton=skel, W_values=Wv)
                 params_json = {

@@ -1687,13 +1687,12 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
               label='Organoid population rate')
     ax_a.plot(t, rate_traces[rep], color='crimson', lw=1.1, zorder=4,
               label=f'RRN twin rate (realisation {rep + 1}/{TWIN_N_TRIALS})')
-    ax_a.axhline(targets['target_rate'], color='gray', ls='--', lw=1.0,
-                 zorder=2, label=f"target rate {targets['target_rate']:.3f} Hz")
-    ax_a.axhline(details['pred_rate'], color='red', ls='--', lw=1.0, zorder=2,
-                 label=f"twin rate {details['pred_rate']:.3f} Hz")
     ax_a.set_xlabel('Time (s)')
     ax_a.set_ylabel('Population firing rate (Hz)')
-    ax_a.set_title('(A) Autonomous twin: one noise realisation vs organoid')
+    ax_a.set_title('(A) Autonomous twin (no input): one noise realisation vs '
+                   'organoid population rate - organoid '
+                   f"{targets['target_rate']:.3f} Hz, twin "
+                   f"{details['pred_rate']:.3f} Hz")
     ax_a.legend(fontsize=8, ncol=2)
     ax_a.grid(True, alpha=0.3)
 
@@ -1712,25 +1711,25 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
     ax_h.legend(fontsize=7, loc='upper right')
     ax_h.grid(True, alpha=0.3)
 
-    # --- (B) spectral profile ---
+    # --- (B) spectral profile: organoid PSD over the twin's trial range ---
     x = detrend(rate_traces, axis=1)
     freqs, psd = welch(x, fs=1.0 / ENV_BIN_S, nperseg=targets['nperseg'], axis=1)
     band = (freqs >= TWIN_PEAK_BAND[0]) & (freqs <= TWIN_PEAK_BAND[1])
     band_psd = psd[:, band]
     band_norm = band_psd / (band_psd.sum(axis=1, keepdims=True) + 1e-30)
-    for row in band_norm:
-        ax_b.plot(freqs[band], row, color='lightcoral', lw=0.5, alpha=0.25)
+    ax_b.fill_between(freqs[band], band_norm.min(axis=0), band_norm.max(axis=0),
+                      color='lightcoral', alpha=0.35, lw=0, zorder=1,
+                      label=f'RRN twin, {TWIN_N_TRIALS} trials (min-max range)')
     ax_b.plot(targets['psd_freqs'], targets['psd_norm'], color='tab:blue',
-              lw=1.6, label='Organoid PSD')
-    ax_b.plot(freqs[band], band_norm.mean(axis=0), color='crimson', lw=1.6,
-              label='Twin PSD (trial mean)')
+              lw=1.6, zorder=3, label='Organoid PSD')
     if targets['target_freq'] is not None:
         ax_b.axvline(targets['target_freq'], color='black', ls='--', lw=1.2,
                      label=f"target {targets['target_freq']:.3f} Hz")
-        ax_b.set_title('(B) Dominant network oscillation (highest peak vs target)')
+        ax_b.set_title('(B) Spectral profile: organoid PSD vs twin trial range '
+                       '- dominant network oscillation vs target')
     else:
-        ax_b.set_title('(B) Spectral profile - no dominant oscillation '
-                       '(1/f-type state, matched by shape/bursts/sync)')
+        ax_b.set_title('(B) Spectral profile: organoid PSD vs twin trial range '
+                       '- no dominant oscillation (1/f-type state)')
         spur = int(round(details.get('twin_peak_frac', 0.0) * TWIN_N_TRIALS))
         ax_b.text(0.98, 0.82, 'no dominant oscillation detected\n'
                   '(prominence vs permutation null, 5% level)\n'
@@ -1766,8 +1765,10 @@ def plot_twin_activity(twin, pop_env, title, output_path, skeleton=None,
               color='darkred', fontweight='bold')
     ax_c.set_xlabel('Time (s)')
     ax_c.set_ylabel('Population firing rate (Hz)')
-    ax_c.set_title('(C) Driven twin: reservoir synchronised to the organoid '
-                   '(teacher-forced; scored right of the split)')
+    ax_c.set_title("(C) Driven twin: reservoir teacher-forced by the "
+                   "organoid's own population-rate envelope (z-scored, "
+                   "sync_gain applied), ridge readout scored on the held-out "
+                   "segment right of the dashed split", fontsize=11)
     ax_c.legend(fontsize=8, ncol=2, loc='upper left')
     ax_c.grid(True, alpha=0.3)
 
@@ -1948,7 +1949,9 @@ def process_recording(rec, out_base):
                            f'{subject} - {label} - NSGA-III optimisation',
                            os.path.join(tw_dir, 'ga_pareto_convergence.png'))
             plot_twin_activity(twin_result, pop_env,
-                               f'{subject} - {label} - Twin vs organoid activity',
+                               f"{subject} - {label} - RRN digital twin vs "
+                               "organoid: autonomous rate, spectrum, and "
+                               "driven synchronisation",
                                os.path.join(tw_dir, 'twin_activity_traces.png'),
                                skeleton=skel, W_values=Wv)
             # CEBRA compares the DRIVEN reservoir's amplitudes (the twin
